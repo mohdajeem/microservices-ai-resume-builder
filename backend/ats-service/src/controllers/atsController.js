@@ -30,7 +30,7 @@ export const analyzeResume = async (req, res) => {
     res.json(result);
 
   } catch (error) {
-    console.error("❌ ATS Analysis Error:", error.message);
+    console.error("ATS Analysis Error:", error.message);
     res.status(500).json({ error: "Processing failed", details: error.message });
   }
 };

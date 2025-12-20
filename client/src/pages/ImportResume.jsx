@@ -60,7 +60,7 @@ const ImportResume = () => {
         TOOLS: Array.isArray(data.skills?.tools) ? data.skills.tools.join(', ') : (data.skills?.tools || ''),
         DATABASES: Array.isArray(data.skills?.databases) ? data.skills.databases.join(', ') : (data.skills?.databases || ''),
       },
-      // ✅ ADDED THESE TWO SECTIONS
+      // ADDED THESE TWO SECTIONS
       certifications: data.certifications || [], // Expecting array of strings
       achievements: data.achievements || []      // Expecting array of strings
     };

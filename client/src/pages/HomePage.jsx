@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext'; // ✅ Import Auth Context
+import { useAuth } from '../context/AuthContext';
 import { 
   ChevronDown, Menu, X, ArrowRight, Sparkles, CheckCircle, 
   UploadCloud, FileText, Zap, Shield, Star, MousePointer2, LayoutDashboard 
@@ -46,7 +46,7 @@ const SectionBadge = ({ children, className = "" }) => (
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user } = useAuth(); // ✅ Check Login Status
+  const { user } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
@@ -79,7 +79,7 @@ const Navbar = () => {
           {/* Auth Buttons */}
           <div className="hidden lg:flex items-center space-x-3">
             {user ? (
-                // ✅ LOGGED IN VIEW
+                // LOGGED IN VIEW
                 <Link 
                   to="/dashboard" 
                   className="bg-[#00c29f] hover:bg-[#00a082] text-white px-6 py-2.5 rounded-full text-sm font-bold transition-all shadow-[0_4px_14px_0_rgba(0,194,159,0.39)] hover:shadow-[0_6px_20px_rgba(0,194,159,0.23)] hover:-translate-y-0.5 relative overflow-hidden group flex items-center gap-2"
@@ -89,7 +89,7 @@ const Navbar = () => {
                   <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                 </Link>
             ) : (
-                // ❌ GUEST VIEW
+                // GUEST VIEW
                 <>
                     <Link to="/login" className="text-sm font-bold text-gray-600 hover:text-black px-4 py-2 transition-colors">
                     Sign in
@@ -185,7 +185,7 @@ const ScannerAnimation = () => {
 
 // --- Updated Hero Section ---
 const Hero = () => {
-  const { user } = useAuth(); // ✅ Check Login Status
+  const { user } = useAuth();
 
   return (
     <div className="relative pt-36 pb-24 lg:pt-44 lg:pb-36 overflow-hidden bg-[#FAFAFA]">
@@ -231,7 +231,7 @@ const Hero = () => {
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-fade-in-up animation-delay-600">
                   {user ? (
-                      // ✅ LOGGED IN BUTTONS
+                      // LOGGED IN BUTTONS
                       <Link 
                         to="/dashboard"
                         className="group bg-[#00c29f] hover:bg-[#00a082] text-white text-lg px-8 py-4 rounded-full font-bold transition-all shadow-[0_10px_20px_rgba(0,194,159,0.3)] hover:-translate-y-1 flex items-center gap-2"
@@ -241,7 +241,7 @@ const Hero = () => {
                         <ArrowRight className="group-hover:translate-x-1 transition-transform" />
                       </Link>
                   ) : (
-                      // ❌ GUEST BUTTONS
+                      // GUEST BUTTONS
                       <>
                         <Link 
                             to="/register"
@@ -398,7 +398,7 @@ const HowItWorks = () => {
 const Pricing = () => {
   const [ref, isVisible] = useElementOnScreen({ threshold: 0.1 });
   const [isAnnual, setIsAnnual] = useState(true);
-  const { user } = useAuth(); // ✅ Check Login Status for redirect logic
+  const { user } = useAuth();
 
   const plans = [
     {
@@ -506,7 +506,7 @@ const Pricing = () => {
 
 const CTA = () => {
   const [ref, isVisible] = useElementOnScreen({ threshold: 0.1 });
-  const { user } = useAuth(); // ✅ Check Login Status
+  const { user } = useAuth();
 
   return (
     <div className="py-28 px-4 relative overflow-hidden">

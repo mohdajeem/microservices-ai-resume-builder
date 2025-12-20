@@ -25,22 +25,8 @@ const Dashboard = () => {
     fetchResumes();       // 2. Get resumes
   }, []);
 
-  // ✅ FIXED FUNCTION: Matches your backend response structure { user: ... }
-//   const refreshUserProfile = async () => {
-//     try {
-//         const res = await authAPI.getMe();
-        
-//         // Check if res.data.user exists
-//         if (res.data && res.data.user) {
-//             const currentToken = localStorage.getItem('token');
-//             // Update Context and LocalStorage with the new Ultimate plan data
-//             login(res.data.user, currentToken);
-//         }
-//     } catch (error) {
-//         console.error("Failed to refresh user profile", error);
-//     }
-//   };
-    const refreshUserProfile = async () => {
+  // FIXED FUNCTION: Matches your backend response structure { user: ... }
+  const refreshUserProfile = async () => {
     try {
         const res = await authAPI.getMe();
         

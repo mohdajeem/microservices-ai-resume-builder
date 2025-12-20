@@ -97,13 +97,13 @@ const MasterProfileSchema = new mongoose.Schema({
     details: String 
   }],
 
-  // ✅ FIXED: Changed from [String] to Array of Objects
+  // FIXED: Changed from [String] to Array of Objects
   certifications: [{
     name: { type: String, default: "" },
     link: { type: String, default: "" }
   }],
 
-  // ✅ FIXED: Changed from [String] to Array of Objects
+  // FIXED: Changed from [String] to Array of Objects
   achievements: [{
     name: { type: String, default: "" },
     link: { type: String, default: "" }

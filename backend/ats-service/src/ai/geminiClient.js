@@ -32,7 +32,7 @@ export async function analyzeWithGemini(resumeText, jobDescription) {
     const response = await result.response;
     let text = response.text();
 
-    // 🧹 Clean markdown code blocks if Gemini adds them
+    // Clean markdown code blocks if Gemini adds them
     text = text.replace(/```json|```/g, "").trim();
 
     return JSON.parse(text);

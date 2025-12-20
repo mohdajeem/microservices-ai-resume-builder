@@ -5,7 +5,7 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { TextArea } from '../components/ui/TextArea';
 import FixListPanel from '../components/FixListPanel'; 
-import CoverLetterModal from '../components/CoverLetterModal'; // ✅ IMPORT
+import CoverLetterModal from '../components/CoverLetterModal';
 import { 
     Loader2, Download, Save, ArrowLeft, Target, X, 
     Trash2, ChevronDown, ChevronUp, Edit3, Wand2, Plus, Link as LinkIcon, FileText
@@ -219,7 +219,7 @@ const ResumeEditor = () => {
     }
   };
 
-  // ✅ PARSER: Handle Experience, Projects, Education, Skills
+  // PARSER: Handle Experience, Projects, Education, Skills
   const flattenAuditReport = (report) => {
     if (!report) return [];
     const fixes = [];
@@ -288,7 +288,7 @@ const ResumeEditor = () => {
     return fixes;
   };
 
-  // ✅ APPLIER: Handle All Section Types
+  // APPLIER: Handle All Section Types
   const applyFixToData = async (fix) => {
     const newData = JSON.parse(JSON.stringify(resumeData));
     let applied = false;
@@ -512,7 +512,7 @@ const ResumeEditor = () => {
                                                 <div className="grid grid-cols-2 gap-2">
                                                     <Input label="Duration" value={edu.duration} onChange={e => handleArrayChange('education', index, 'duration', e.target.value)} />
                                                     
-                                                    {/* ✅ FIX for Education Details */}
+                                                    {/* FIX for Education Details */}
                                                     <div className={highlightId === currentId ? 'animate-flash rounded-lg' : ''}>
                                                         <Input 
                                                             id={currentId} 
@@ -554,7 +554,7 @@ const ResumeEditor = () => {
                                             <div key={index} className="bg-white p-3 rounded-xl border border-gray-100 flex flex-col gap-2 relative">
                                                 <button onClick={() => removeArrayItem('certifications', index)} className="absolute top-3 right-3 text-gray-400 hover:text-red-500"><X size={16}/></button>
                                                 
-                                                {/* ✅ FIX: Applied animation to a wrapper div instead of Input directly */}
+                                                {/* FIX: Applied animation to a wrapper div instead of Input directly */}
                                                 <div className={highlightId === currentId ? 'animate-flash rounded-lg' : ''}>
                                                     <Input 
                                                         id={currentId} 
@@ -587,7 +587,7 @@ const ResumeEditor = () => {
                                             <div key={index} className="bg-white p-3 rounded-xl border border-gray-100 flex flex-col gap-2 relative">
                                                 <button onClick={() => removeArrayItem('achievements', index)} className="absolute top-3 right-3 text-gray-400 hover:text-red-500"><X size={16}/></button>
                                                 
-                                                {/* ✅ FIX: Applied animation to a wrapper div */}
+                                                {/* FIX: Applied animation to a wrapper div */}
                                                 <div className={highlightId === currentId ? 'animate-flash rounded-lg' : ''}>
                                                     <Input 
                                                         id={currentId} 

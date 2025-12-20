@@ -30,5 +30,5 @@ mongoose.connect(process.env.MONGO_URI)
 app.use('/', apiRoutes);
 
 app.listen(PORT, () => {
-  console.log(`🚀 Resume Microservice running on http://localhost:${PORT}`);
+  console.log(`Resume Microservice running on http://localhost:${PORT}`);
 });

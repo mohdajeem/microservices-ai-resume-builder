@@ -26,12 +26,12 @@ app.use(cors({
 
 // 5. Health Check
 app.get('/', (req, res) => {
-  res.send('🛡️ Secure Gateway Running');
+  res.send('Secure Gateway Running');
 });
 
 // 6. Routes
 proxyRoutes(app);
 
 app.listen(PORT, () => {
-  console.log(`🌐 Secure Gateway running on http://localhost:${PORT}`);
+  console.log(`Secure Gateway running on http://localhost:${PORT}`);
 });

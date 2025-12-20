@@ -21,8 +21,8 @@ app.use((req, res, next) => {
 app.use(cors());
 
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ Payment DB Connected"))
-  .catch(err => console.error("❌ DB Error:", err));
+  .then(() => console.log("Payment DB Connected"))
+  .catch(err => console.error("DB Error:", err));
 
 app.use('/', paymentRoutes);
 

@@ -21,7 +21,7 @@ const setupProxies = (app) => {
                 }
             },
             onError: (err, req, res) => {
-                console.error("❌ Auth Service Error:", err.message);
+                console.error("Auth Service Error:", err.message);
                 res.status(502).json({ error: "Auth Service Down" });
             }
         })
@@ -126,60 +126,8 @@ const setupProxies = (app) => {
         })
     );
 
-//     // --- 6. PAYMENT SERVICE ---
-//     app.use(
-//         '/api/payment',
-//         // Note: Do NOT use verifyToken for /webhook as Stripe calls it, not the user
-//         // We handle logic inside to apply verifyToken only to checkout
-//         createProxyMiddleware({
-//             target: 'http://localhost:9000',
-//             changeOrigin: true,
-//             pathRewrite: { '^/api/payment': '' },
-//             onProxyReq: (proxyReq, req, res) => {
-//                 // Inject User ID only for checkout, not webhook
-//                 if (req.user) {
-//                     proxyReq.setHeader('x-user-id', req.user.id);
-//                     proxyReq.setHeader('x-user-email', req.user.email);
-//                 }
-//             }
-//         })
-//     );
 
-//     // A. PAYMENT - CHECKOUT (Protected)
-//     app.use(
-//         '/api/payment/create-checkout-session',
-//         verifyToken,
-//         createProxyMiddleware({
-//             target: 'http://localhost:9000',
-//             changeOrigin: true,
-//             pathRewrite: { '^/api/payment': '' }, // Becomes /create-checkout-session
-//             onProxyReq: (proxyReq, req, res) => {
-//                if (req.user) {
-//                    proxyReq.setHeader('x-user-id', req.user.id);
-//                    proxyReq.setHeader('x-user-email', req.user.email);
-//                }
-//             }
-//         })
-//     );
-
-//     // B. PAYMENT - WEBHOOK (Public)
-//     app.use(
-//         '/api/payment/webhook',
-//         createProxyMiddleware({
-//             target: 'http://localhost:9000',
-//             changeOrigin: true,
-//             pathRewrite: { '^/api/payment': '' } // Becomes /webhook
-//         })
-//     );
-        // ----------------------------------------------------------
-    // 6. PAYMENT SERVICE (Port 9000)
-    // ----------------------------------------------------------
-    
-    // ❌ DELETE THIS GENERIC BLOCK from your code:
-    /* app.use('/api/payment', createProxyMiddleware({ ... })); 
-    */
-
-    // ✅ KEEP THESE TWO SPECIFIC BLOCKS:
+    // KEEP THESE TWO SPECIFIC BLOCKS:
 
     // A. PAYMENT - CHECKOUT (Protected - Needs Token)
     // This injects the User ID so the Payment Service knows who is buying

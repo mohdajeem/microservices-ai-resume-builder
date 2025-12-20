@@ -23,7 +23,8 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  // ✅ FIX: This function purely updates state. It does NOT call the API.
+  // FIX: This function purely updates state. It does NOT call the API.
+  // API calls belong in Login.jsx (authAPI.login) and Register.jsx (authAPI.register)
   const login = (userData, token) => {
     setUser(userData);
     localStorage.setItem('token', token);

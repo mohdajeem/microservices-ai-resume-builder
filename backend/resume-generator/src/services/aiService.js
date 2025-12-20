@@ -145,7 +145,7 @@ export const generateComprehensiveAudit = async (resumeData, jobDescription, ats
     const result = await model.generateContent(prompt);
     const response = await result.response;
     let text = response.text();
-    // 🧹 SANITIZATION
+    // SANITIZATION
     text = text.replace(/```json/g, '').replace(/```/g, '').trim();
 
     return JSON.parse(text);

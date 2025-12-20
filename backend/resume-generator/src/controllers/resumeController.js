@@ -7,7 +7,7 @@ import { generateComprehensiveAudit, generateCoverLetter } from '../services/aiS
 // HELPER FUNCTIONS
 // =========================================================
 
-// ✅ HELPER 1: Case-insensitive key reader
+// HELPER 1: Case-insensitive key reader
 // Reads obj.key, obj.KEY, or obj.Key safely
 const getValue = (obj, key) => {
   if (!obj) return "";
@@ -19,7 +19,7 @@ const normalizeResumeData = (rawData, userId) => {
 
   const getNested = (parent, key) => parent ? getValue(parent, key) : "";
 
-  // ✅ FIXED: Robust mapper for Certs/Achievements
+  // FIXED: Robust mapper for Certs/Achievements
   const mapItemWithLink = (items) => {
     if (!items || !Array.isArray(items)) return [];
     
@@ -83,7 +83,7 @@ const normalizeResumeData = (rawData, userId) => {
       soft_skills: getNested(rawData.SKILLS || rawData.skills, 'soft_skills'),
     },
 
-    // ✅ APPLY THE FIX HERE
+    // APPLY THE FIX HERE
     certifications: mapItemWithLink(rawData.CERTIFICATIONS || rawData.certifications),
     achievements: mapItemWithLink(rawData.ACHIEVEMENTS || rawData.achievements)
   };
@@ -107,7 +107,7 @@ export const createProfile = async (req, res) => {
     // Normalize Data
     const masterData = normalizeResumeData(rawData, userId);
 
-    // --- 🛑 CHANGED LOGIC START 🛑 ---
+    // --- CHANGED LOGIC START ---
     
     // 1. Check if Master Profile exists
     let masterProfile = await MasterProfile.findOne({ userId });
@@ -124,7 +124,7 @@ export const createProfile = async (req, res) => {
       );
     }
     
-    // --- 🛑 CHANGED LOGIC END 🛑 ---
+    // --- CHANGED LOGIC END ---
 
     // 3. Create Resume Snapshot (Always uses the incoming data, not necessarily Master)
     // We use 'masterData' here because it's the normalized version of what the user sent
@@ -162,9 +162,9 @@ export const createProfile = async (req, res) => {
 // 2. Audit Resume (AI)
 export const auditResume = async (req, res) => {
   try {
-    // ✅ Extract atsImprovements from request body
+    // Extract atsImprovements from request body
     const { resumeData, jobDescription, atsImprovements } = req.body;
-    // ✅ Pass it to the service
+    // Pass it to the service
     const auditReport = await generateComprehensiveAudit(
         resumeData, 
         jobDescription, 
@@ -188,7 +188,7 @@ export const updateResumeVersion = async (req, res) => {
     const resume = await ResumeVersion.findById(id);
     if (!resume) return res.status(404).json({ error: "Resume not found" });
 
-    // ✅ CHECK 1: Do we have content to update?
+    // CHECK 1: Do we have content to update?
     if (updatedContent && Object.keys(updatedContent).length > 0) {
       // Normalize the incoming data to match Schema structure
       const cleanContent = normalizeResumeData(updatedContent, null);
@@ -201,7 +201,7 @@ export const updateResumeVersion = async (req, res) => {
       resume.latexCode = newLatex;
     }
 
-    // ✅ CHECK 2: Do we have ATS Data to update?
+    // CHECK 2: Do we have ATS Data to update?
     if (atsScore !== undefined) resume.atsScore = atsScore;
     if (atsAnalysis !== undefined) resume.atsAnalysis = atsAnalysis;
     if (jobDescription !== undefined) resume.jobDescription = jobDescription;
@@ -277,7 +277,7 @@ export const updateMasterProfile = async (req, res) => {
     const userId = req.headers['x-user-id'];
     const { userData } = req.body; 
     
-    // ✅ NORMALIZE HERE TOO
+    // NORMALIZE HERE TOO
     const masterData = normalizeResumeData(userData, userId);
 
     const updatedProfile = await MasterProfile.findOneAndUpdate(

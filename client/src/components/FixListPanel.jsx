@@ -43,7 +43,7 @@ const FixListPanel = ({ auditReport, onApplyFix, loading }) => {
         {auditReport.map((fix, index) => {
             const isFixed = fixedItems[index];
 
-            // ✅ SUCCESS STATE (Render Green Card)
+            // SUCCESS STATE (Render Green Card)
             if (isFixed) {
                 return (
                     <div key={index} className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center justify-between animate-fade-in-up transition-all duration-500">
@@ -60,7 +60,7 @@ const FixListPanel = ({ auditReport, onApplyFix, loading }) => {
                 );
             }
 
-            // ✅ STANDARD STATE (Render Suggestion Card)
+            // STANDARD STATE (Render Suggestion Card)
             return (
               <div key={index} className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow group">
                 

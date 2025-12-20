@@ -56,13 +56,6 @@ export const resumeAPI = {
   generateCoverLetter: (data) => api.post('/api/resume/cover-letter', data),
 };
 
-// export const atsAPI = {
-//   // Multipart form data is handled automatically by axios when passing FormData
-//   // We DO NOT manually set Content-Type here; Axios does it with the boundary
-//   analyze: (formData) => api.post('/api/ats/analyze', formData),
-//   parse: (formData) => api.post('/api/ats/parse', formData)
-// };
-
 export const atsAPI = {
   analyze: (formData) => api.post('/api/ats/analyze', formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
@@ -71,12 +64,6 @@ export const atsAPI = {
     headers: { 'Content-Type': 'multipart/form-data' }
   })
 };
-
-
-// ✅ ADD THIS: Compiler API (The Missing Piece)
-
-
-
 
 export const compilerAPI = {
   compile: (latexCode) => api.post('/api/compiler/compile', 

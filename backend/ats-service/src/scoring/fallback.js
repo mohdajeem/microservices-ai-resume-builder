@@ -1,5 +1,5 @@
 /**
- * 🧮 Simple keyword matching score (Backup Logic)
+ * Simple keyword matching score (Backup Logic)
  */
 export function calculateBasicScore(resumeText, jobDescription) {
   const jdKeywords =

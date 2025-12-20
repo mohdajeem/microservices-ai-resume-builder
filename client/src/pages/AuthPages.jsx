@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { authAPI } from '../lib/api'; // ✅ Import API
+import { authAPI } from '../lib/api';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { Sparkles, ArrowLeft } from 'lucide-react';
-import { useToast } from '../context/ToastContext'; // ✅ Import Toast Hook
+import { useToast } from '../context/ToastContext';
 
 export const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -106,52 +106,6 @@ export const Register = () => {
   const { login } = useAuth(); 
   const navigate = useNavigate();
   const toast = useToast();
-
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   setError('');
-  //   setLoading(true);
-
-  //   // Basic Validation before sending to backend
-  //   if (formData.password.length < 6) {
-  //       setLoading(false);
-  //       setError("Password must be at least 6 characters long");
-  //       toast.error("Password must be at least 6 characters long");
-  //       return;
-  //   }
-
-  //   try {
-  //     console.log("Sending Registration Data:", formData); // Debugging Log
-
-  //     // 1. Call Register API
-  //     const res = await authAPI.register(formData);
-      
-  //     // 2. Check Success
-  //     if (res.data.success || res.data.token) {
-  //         const userData = res.data.data || res.data.user;
-  //         const token = res.data.token;
-
-  //         // 3. Auto Login
-  //         login(userData, token);
-          
-  //         toast.success("Account created! Welcome to NexusJob.");
-  //         navigate('/dashboard');
-  //     }
-  //   } catch (err) {
-  //     console.error("Registration Error:", err);
-      
-  //     // ✅ FIX: Extract the specific error message from the backend response
-  //     // Backend usually sends: { success: false, message: "User already exists" }
-  //     const msg = err.response?.data?.message || 
-  //                 err.response?.data?.error || 
-  //                 'Registration failed. Please try again.';
-      
-  //     toast.error(msg);
-  //     setError(msg);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -264,7 +218,6 @@ export const Register = () => {
   );
 };
 
-// export const Register = () => {
 //   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
 //   const [error, setError] = useState('');
 //   const [loading, setLoading] = useState(false);

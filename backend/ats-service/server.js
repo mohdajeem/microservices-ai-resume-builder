@@ -18,5 +18,5 @@ app.use(express.json());
 app.use("/", atsRoutes);
 
 app.listen(PORT, () => {
-  console.log(`🚀 ATS Service running on port ${PORT}`);
+  console.log(`ATS Service running on port ${PORT}`);
 });

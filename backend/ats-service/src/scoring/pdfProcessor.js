@@ -8,7 +8,7 @@ const require = createRequire(import.meta.url);
 const pdfjsLib = require("pdfjs-dist/legacy/build/pdf.js");
 
 /**
- * 🧹 Cleans artifacts, bullets, and excessive whitespace
+ * Cleans artifacts, bullets, and excessive whitespace
  */
 const cleanText = (text) => {
   return text
@@ -19,7 +19,7 @@ const cleanText = (text) => {
 };
 
 /**
- * 📄 Extracts text from a memory buffer
+ * Extracts text from a memory buffer
  * @param {Buffer} buffer - The file buffer from Multer
  */
 export async function extractTextFromBuffer(buffer) {

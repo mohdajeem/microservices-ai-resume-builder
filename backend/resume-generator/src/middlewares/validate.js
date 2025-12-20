@@ -51,7 +51,7 @@ export const resumeSchema = z.object({
         databases: z.string().optional().or(z.literal(''))
     }).optional(),
 
-    // ✅ NEW: Update these to accept Objects { name, link }
+    // NEW: Update these to accept Objects { name, link }
     certifications: z.array(z.object({
         name: z.string().optional().or(z.literal('')),
         link: z.string().optional().or(z.literal(''))

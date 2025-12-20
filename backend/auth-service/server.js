@@ -26,5 +26,5 @@ mongoose.connect(process.env.MONGO_URI)
 app.use('/', authRoutes); 
 
 app.listen(PORT, () => {
-  console.log(`🔐 Auth Service running on port ${PORT}`);
+  console.log(`Auth Service running on port ${PORT}`);
 });
