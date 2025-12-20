@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Optional: Smooth scrolling for the whole app */
+html {
+  scroll-behavior: smooth;
+}
+
+@layer components {
+  .toast-enter {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  .toast-enter-active {
+    transform: translateX(0);
+    opacity: 1;
+    transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .toast-exit {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  .toast-exit-active {
+    transform: translateX(100%);
+    opacity: 0;
+    transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+@keyframes flash {
+  0% { 
+    background-color: rgba(0, 194, 159, 0.2); 
+    box-shadow: 0 0 0 2px #00c29f; 
+    border-color: #00c29f;
+  }
+  100% { 
+    background-color: transparent; 
+    box-shadow: none; 
+    border-color: #e5e7eb; /* matches standard gray-200 border */
+  }
+}
+
+.animate-flash {
+  animation: flash 2s ease-out forwards;
+}
+
+/* Optional: Custom Scrollbar for the editor panels */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #e5e7eb;
+  border-radius: 20px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #d1d5db;
+}

@@ -1,0 +1,216 @@
+import { createProxyMiddleware } from 'http-proxy-middleware';
+import { verifyToken } from '../middlewares/authMiddleware.js';
+import { aiLimiter, generalLimiter } from '../middlewares/rateLimiter.js';
+import { checkTier } from '../middlewares/subscriptionMiddleware.js';
+
+const setupProxies = (app) => {
+    
+    // ----------------------------------------------------------
+    // 1. PROTECTED AUTH ROUTES (Change Pass, Delete Account)
+    // ----------------------------------------------------------
+    app.use(
+        ['/api/auth/password', '/api/auth/me'], 
+        verifyToken, 
+        createProxyMiddleware({
+            target: 'http://localhost:4000',
+            changeOrigin: true,
+            pathRewrite: { '^/api/auth': '' }, 
+            onProxyReq: (proxyReq, req, res) => {
+                if (req.user) {
+                    proxyReq.setHeader('x-user-id', req.user.id); 
+                }
+            },
+            onError: (err, req, res) => {
+                console.error("❌ Auth Service Error:", err.message);
+                res.status(502).json({ error: "Auth Service Down" });
+            }
+        })
+    );
+
+    // ----------------------------------------------------------
+    // 2. PUBLIC AUTH ROUTES (Login, Register)
+    // ----------------------------------------------------------
+    app.use(
+        '/api/auth',
+        generalLimiter,
+        createProxyMiddleware({
+            target: 'http://localhost:4000',
+            changeOrigin: true,
+            pathRewrite: { '^/api/auth': '' },
+            onError: (err, req, res) => res.status(502).json({ error: "Auth Service Down" })
+        })
+    );
+
+    // ----------------------------------------------------------
+    // 3. RESUME GENERATOR ROUTES
+    // ----------------------------------------------------------
+
+    // A. STRICT ROUTES (AI Audit) - AI Usage Gate
+    app.use(
+        '/api/resume/audit', 
+        aiLimiter, 
+        verifyToken,
+        createProxyMiddleware({
+            target: 'http://localhost:5000',
+            changeOrigin: true,
+            pathRewrite: { '^/api/resume': '' },
+            onProxyReq: (proxyReq, req, res) => {
+                if (req.user) {
+                    proxyReq.setHeader('x-user-id', req.user.id);
+                    proxyReq.setHeader('x-user-plan', req.user.plan || 'free'); 
+                }
+            },
+            onError: (err, req, res) => res.status(502).json({ error: "Resume Service Down" })
+        })
+    );
+
+    // B. GENERAL ROUTES (List, Create, Update, PDF)
+    app.use(
+        '/api/resume', 
+        generalLimiter, 
+        verifyToken,
+        createProxyMiddleware({
+            target: 'http://localhost:5000',
+            changeOrigin: true,
+            pathRewrite: { '^/api/resume': '' },
+            onProxyReq: (proxyReq, req, res) => {
+                if (req.user) {
+                    proxyReq.setHeader('x-user-id', req.user.id);
+                    proxyReq.setHeader('x-user-email', req.user.email);
+                    proxyReq.setHeader('x-user-plan', req.user.plan || 'free');
+                }
+            },
+            onError: (err, req, res) => res.status(502).json({ error: "Resume Service Down" })
+        })
+    );
+
+    // ----------------------------------------------------------
+    // 4. ATS SERVICE (Pro Feature) - Tier Gate
+    // ----------------------------------------------------------
+    app.use(
+        '/api/ats',
+        aiLimiter, 
+        verifyToken,
+        // checkTier('pro'), // <--- BLOCKS FREE USERS
+        createProxyMiddleware({
+            target: 'http://localhost:7000',
+            changeOrigin: true,
+            pathRewrite: { '^/api/ats': '' },
+            onProxyReq: (proxyReq, req, res) => {
+                // Ensure headers are preserved for file uploads
+                if (req.headers['content-type']) {
+                    proxyReq.setHeader('Content-Type', req.headers['content-type']);
+                }
+                if (req.headers['content-length']) {
+                    proxyReq.setHeader('Content-Length', req.headers['content-length']);
+                }
+                if (req.user) proxyReq.setHeader('x-user-id', req.user.id);
+            },
+            onError: (err, req, res) => res.status(502).json({ error: "ATS Service Down" })
+        })
+    );
+
+    // ----------------------------------------------------------
+    // 5. COMPILER SERVICE (Pro Feature) - Tier Gate
+    // ----------------------------------------------------------
+    app.use(
+        '/api/compiler',
+        generalLimiter,
+        verifyToken,
+        // checkTier('pro'), // Uncomment to enforce payment for PDF
+        createProxyMiddleware({
+            target: 'http://localhost:6000',
+            changeOrigin: true,
+            pathRewrite: { '^/api/compiler': '' },
+            onError: (err, req, res) => res.status(502).json({ error: "Compiler Service Down" })
+        })
+    );
+
+//     // --- 6. PAYMENT SERVICE ---
+//     app.use(
+//         '/api/payment',
+//         // Note: Do NOT use verifyToken for /webhook as Stripe calls it, not the user
+//         // We handle logic inside to apply verifyToken only to checkout
+//         createProxyMiddleware({
+//             target: 'http://localhost:9000',
+//             changeOrigin: true,
+//             pathRewrite: { '^/api/payment': '' },
+//             onProxyReq: (proxyReq, req, res) => {
+//                 // Inject User ID only for checkout, not webhook
+//                 if (req.user) {
+//                     proxyReq.setHeader('x-user-id', req.user.id);
+//                     proxyReq.setHeader('x-user-email', req.user.email);
+//                 }
+//             }
+//         })
+//     );
+
+//     // A. PAYMENT - CHECKOUT (Protected)
+//     app.use(
+//         '/api/payment/create-checkout-session',
+//         verifyToken,
+//         createProxyMiddleware({
+//             target: 'http://localhost:9000',
+//             changeOrigin: true,
+//             pathRewrite: { '^/api/payment': '' }, // Becomes /create-checkout-session
+//             onProxyReq: (proxyReq, req, res) => {
+//                if (req.user) {
+//                    proxyReq.setHeader('x-user-id', req.user.id);
+//                    proxyReq.setHeader('x-user-email', req.user.email);
+//                }
+//             }
+//         })
+//     );
+
+//     // B. PAYMENT - WEBHOOK (Public)
+//     app.use(
+//         '/api/payment/webhook',
+//         createProxyMiddleware({
+//             target: 'http://localhost:9000',
+//             changeOrigin: true,
+//             pathRewrite: { '^/api/payment': '' } // Becomes /webhook
+//         })
+//     );
+        // ----------------------------------------------------------
+    // 6. PAYMENT SERVICE (Port 9000)
+    // ----------------------------------------------------------
+    
+    // ❌ DELETE THIS GENERIC BLOCK from your code:
+    /* app.use('/api/payment', createProxyMiddleware({ ... })); 
+    */
+
+    // ✅ KEEP THESE TWO SPECIFIC BLOCKS:
+
+    // A. PAYMENT - CHECKOUT (Protected - Needs Token)
+    // This injects the User ID so the Payment Service knows who is buying
+    app.use(
+        '/api/payment/create-checkout-session',
+        verifyToken, 
+        createProxyMiddleware({
+            target: 'http://localhost:9000',
+            changeOrigin: true,
+            pathRewrite: { '^/api/payment': '' }, // Becomes /create-checkout-session
+            onProxyReq: (proxyReq, req, res) => {
+                if (req.user) {
+                    proxyReq.setHeader('x-user-id', req.user.id);
+                    proxyReq.setHeader('x-user-email', req.user.email);
+                }
+            },
+            onError: (err, req, res) => res.status(502).json({ error: "Payment Service Down" })
+        })
+    );
+
+    // B. PAYMENT - WEBHOOK (Public - No Token)
+    // Stripe calls this directly, so we cannot check for a User Token
+    app.use(
+        '/api/payment/webhook',
+        createProxyMiddleware({
+            target: 'http://localhost:9000',
+            changeOrigin: true,
+            pathRewrite: { '^/api/payment': '' }, // Becomes /webhook
+            onError: (err, req, res) => res.status(502).json({ error: "Payment Service Down" })
+        })
+    );
+};
+
+export default setupProxies;

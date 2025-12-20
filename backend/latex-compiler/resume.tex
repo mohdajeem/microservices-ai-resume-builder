@@ -1,0 +1,205 @@
+%-------------------------
+% Resume in Latex
+% Author : Abey George
+% Based off of: https://github.com/sb2nov/resume
+% License : MIT
+%------------------------
+
+\documentclass[11pt]{article}
+
+% --- Tectonic/XeTeX Specific Setup ---
+% Removed inputenc/fontenc as Tectonic is natively UTF-8
+\usepackage{lmodern} % Safe font package
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\usepackage{fontawesome5}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{svg.path}
+\usepackage{xcolor}
+
+\setlength{\columnsep}{-1pt}
+
+% --- Colors ---
+\definecolor{cvblue}{HTML}{0E5484}
+\definecolor{black}{HTML}{130810}
+\definecolor{darkcolor}{HTML}{0F4539}
+\definecolor{cvgreen}{HTML}{3BD80D}
+\definecolor{taggreen}{HTML}{00E278}
+\definecolor{SlateGrey}{HTML}{2E2E2E}
+\definecolor{LightGrey}{HTML}{666666}
+
+\colorlet{name}{black}
+\colorlet{tagline}{darkcolor}
+\colorlet{heading}{darkcolor}
+\colorlet{headingrule}{cvblue}
+\colorlet{accent}{darkcolor}
+\colorlet{emphasis}{SlateGrey}
+\colorlet{body}{LightGrey}
+
+% Adjust margins
+\addtolength{\oddsidemargin}{-0.6in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{1.19in}
+\addtolength{\topmargin}{-.7in}
+\addtolength{\textheight}{1.4in}
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Sections formatting
+\titleformat{\section}{
+  \vspace{-4pt}\scshape\raggedright\large\bfseries
+}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+
+% --- REMOVED: \pdfgentounicode=1 (This causes the crash in Tectonic) ---
+
+%-------------------------
+% Custom commands
+\newcommand{\resumeItem}[1]{\item\small{#1 \vspace{-2pt}}}
+\newcommand{\classesList}[4]{\item\small{{#1 #2 #3 #4 \vspace{-2pt}}}}
+
+\newcommand{\resumeSubheading}[2]{\vspace{-2pt}\item
+  \begin{tabular*}{1.0\textwidth}[t]{l@{\extracolsep{\fill}}r}
+    \textbf{\large#1} & \textbf{\small #2} \\
+  \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubSubheading}[2]{\item
+  \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+    \textit{\small#1} & \textit{\small #2} \\
+  \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{\item
+  \begin{tabular*}{1.0\textwidth}{l@{\extracolsep{\fill}}r}
+    \small#1 & \textbf{\small #2}\\
+  \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubItem}[1]{\resumeItem{#1}\vspace{-4pt}}
+
+\renewcommand\labelitemi{$\vcenter{\hbox{\tiny$\bullet$}}$}
+\renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.0in, label={}]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+
+\newcommand\sbullet[1][.5]{\mathbin{\vcenter{\hbox{\scalebox{#1}{$\bullet$}}}}}
+
+%-------------------------------------------
+%%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+%----------HEADING----------
+\begin{center}
+    {\Huge \scshape Mohd Ajeem} \\ \vspace{1pt}
+    Baghpat, Uttar Pradesh \\ \vspace{1pt}
+    \small \underline{\href{tel:+919045308027}{+91-9045308027}} ~ 
+    \underline{\href{mailto:mohdajeem2003@gmail.com}{mohdajeem2003@gmail.com}} ~ 
+     \underline{\href{https://www.linkedin.com/in/mohd-ajeem-552822256/}{linkedin.com/in/mohd-ajeem-552822256}} ~ 
+     \underline{\href{https://github.com/mohdajeem}{github.com/mohdajeem}} ~
+\end{center}
+\vspace{-4pt}
+
+%-----------PROJECTS-----------
+\section{PROJECTS}
+\resumeSubHeadingListStart
+
+\resumeProjectHeading
+  {\href{https://github.com/mohdajeem/N-Queen-Visualizer}{\underline{\textbf{\large{QueenSolver: Java-Based N-Queens Visualizer}}}} $|$ \large{Core Java, Swing, AWT}}{December 2023}
+  \resumeItemListStart
+    \resumeItem{Developed a \textbf{Java-based} visualization and solver for the N-Queens problem using \textbf{optimized backtracking algorithms} and \textbf{dynamic UI updates}, improving \textbf{algorithm efficiency} and \textbf{problem-solving} accuracy.}
+    \resumeItem{Implemented a \textbf{backtracking algorithm} with \textbf{dynamic board updates}, \textbf{real-time queen placement}, and \textbf{visual solution highlights}.}
+  \resumeItemListEnd
+\vspace{-1pt}
+
+\resumeSubheading
+    {\href{https://github.com/mohdajeem/AgroVision}{\underline{\textbf{\large{CropIQ: Smart Crop Recommendation System}}}} $|$ \large{Python, ML, CI/CD, Agile}}{March 2024}
+  \resumeItemListStart
+    \resumeItem{Designed and deployed a \textbf{distributed prediction system} (\textbf{92\% accuracy}) processing \textbf{5,000+ environmental records} to recommend optimal crops. Built a \textbf{fault-tolerant}, \textbf{low-cost}, and \textbf{scalable backend} in \textbf{Flask}, containerized with \textbf{Docker}, and automated deployments via \textbf{GitHub Actions} in an \textbf{agile environment}.}
+    \resumeItem{Integrated model with a \textbf{Flask frontend}, containerized the system using \textbf{Docker}, and implemented \textbf{CI/CD} via \textbf{GitHub Actions}.}
+    \resumeItem{Collaborated with teammate responsible for data scraping and UI; achieved \textbf{70\% reduction} in manual deployment time.}
+  \resumeItemListEnd
+\vspace{-2pt}
+
+\resumeSubheading
+    {\href{https://github.com/mohdajeem/SnapStack}{\underline{\textbf{\large{SnapStack: AI Code Generator}}}} $|$ \large{MERN Stack, Gemini API}}{March 2024}
+  \resumeItemListStart
+    \resumeItem{Engineered a \textbf{scalable}, \textbf{fault-tolerant}, \textbf{AI-powered multi-tiered system} for generating \textbf{React components} and pages using \textbf{LLM models} (Gemini/LLaMA3) via \textbf{OpenRouter API}. Implemented \textbf{distributed session persistence} in \textbf{MongoDB}, \textbf{JWT-based authentication}, and \textbf{index/query optimizations} for fast code retrieval.}
+    \resumeItem{Developed frontend in \textbf{React (Vite)} and backend in \textbf{Express.js}; deployed on \textbf{Vercel} and \textbf{Railway}.}
+    \resumeItem{Enabled \textbf{full session recovery} and \textbf{one-click code export} (ZIP/copy-to-clipboard) for developer reusability.}
+    \resumeItem{\textbf{Live Demo:} \href{https://snap-stack-pw13.vercel.app}{snap-stack-pw13.vercel.app}}
+  \resumeItemListEnd
+\vspace{-2pt}
+
+\resumeSubHeadingListEnd
+
+%-----------SKILLS-----------
+\section{SKILLS \& TECHNOLOGIES}
+\resumeItemListStart
+  \resumeItem{\textbf{Languages:} Java, Python, JavaScript, C++ (basic)}
+  \resumeItem{\textbf{Core CS Concepts:} OOP, Data Structures \& Algorithms, Operating Systems, DBMS, CN}
+  \resumeItem{\textbf{Frameworks/Libraries:} React.js, Node.js, Express.js, Flask, Scikit-learn}
+  \resumeItem{\textbf{DevOps \& Tools:} Docker, GitHub Actions, Git, Postman, CI/CD}
+  \resumeItem{\textbf{Databases:} MongoDB, SQL}
+  \resumeItem{\textbf{Other Skills:} Problem-solving, Algorithm Design, Team Collaboration, Software Engineering Techniques}
+\resumeItemListEnd
+
+%-----------CERTIFICATIONS-----------
+\section{CERTIFICATIONS}
+\begin{itemize}[leftmargin=0in,label={}]
+  \item
+    \begin{itemize}
+      \item \small Complete \textbf{Machine Learning \& Data Science} – GeeksforGeeks \underline{\href{https://www.geeksforgeeks.org/certificate/86dc0b5815f2f90a6ed759765133f464}{Certificate}}
+      \item \small \textbf{Dynamic Programming \& Greedy Algorithms} – Coursera \underline{\href{https://www.coursera.org/account/accomplishments/verify/2ERBEY3TCH8F}{Certificate}}
+      \item \small \textbf{Prompt Engineering for ChatGPT} – Coursera \underline{\href{https://www.coursera.org/account/accomplishments/verify/9TW6NBJS6JLS}{Certificate}}
+    \end{itemize}
+\end{itemize}
+
+%-----------ACHIEVEMENTS-----------
+\section{ACHIEVEMENTS}
+\begin{itemize}[leftmargin=0in,label={}]
+  \item
+    \begin{itemize}
+      \item \small Solved \textbf{500+} Problems on \textbf{LeetCode} (Contest Rating: \textbf{1700+}). \underline{\href{https://leetcode.com/u/mohdajeem/}{Profile}}
+      \item \small Solved \textbf{150+} Problems across \textbf{GeeksforGeeks} and Hackerrank. \underline{\href{https://www.geeksforgeeks.org/user/ajeem127x4c/}{Profile}}
+      \item \small Secured \textbf{1\textsuperscript{st} Runner Up} in Code Carva Hackathon for building a real-time AI coding platform in a 24-hour collaborative sprint.
+      \item \small Participated in \textbf{Smart India Hackathon (SIH)} — developed scalable tech solutions in a multidisciplinary team environment.
+    \end{itemize}
+\end{itemize}
+
+
+%-----------EDUCATION-----------
+\section{EDUCATION}
+\resumeSubHeadingListStart
+
+\resumeSubheading
+  {Lovely Professional University, Punjab}{2022 -- 2026}
+\resumeItemListStart
+  \resumeItem{B.Tech CSE -- CGPA: 8.62}
+\resumeItemListEnd
+
+\resumeSubheading
+  {SD Inter College Sadar, Meerut}{2020}
+\resumeItemListStart
+  \resumeItem{Higher Secondary (Class XII) -- 75.66\%}
+\resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+\end{document}

@@ -1,0 +1,17 @@
+{
+  "name": "latex-compiler",
+  "version": "1.0.0",
+  "description": "this is latex compiler, latex to pdf generator",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "morgan": "^1.10.1"
+  }
+}
