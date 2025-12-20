@@ -1,0 +1,26 @@
+﻿# Ignore everything
+/*
+
+# But include these folders
+!/backend/
+!/client/
+!/.gitignore
+!/README.md
+
+# Ignore node_modules in included folders
+**/node_modules/
+**/.env
+**/.env.local
+**/.env.production
+
+# Ignore docs folders
+**/docs/
+backend/docs/
+
+# Ignore build outputs
+**/dist/
+**/build/
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
