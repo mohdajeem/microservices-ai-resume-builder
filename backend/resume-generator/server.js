@@ -5,6 +5,7 @@ import cors from 'cors';
 // import mongoSanitize from 'express-mongo-sanitize'; // <--- 1. IMPORT
 import { mongoSanitize } from './src/middlewares/security.js';
 import apiRoutes from './src/routes/apiRoutes.js';
+import { requireInternal } from './src/middlewares/requireInternal.js';
 
 dotenv.config();
 
@@ -15,14 +16,20 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+app.get('/health', (req, res)=>{
+  res.json({status: "ok", message: "resume generator service is running..."});
+})
+
+app.use(requireInternal);
+
 // 3. SANITIZE HERE
 app.use(mongoSanitize);
 
 
 // Database Connection
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch(err => console.error("❌ DB Error:", err));
+  .then(() => console.log("MongoDB Connected"))
+  .catch(err => console.error("DB Error:", err));
 
 // Routes
 // CRITICAL FIX: Gateway sends requests stripped of prefixes (e.g., /create).

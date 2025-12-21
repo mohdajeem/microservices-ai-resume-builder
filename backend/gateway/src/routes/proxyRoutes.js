@@ -16,6 +16,8 @@ const setupProxies = (app) => {
             changeOrigin: true,
             pathRewrite: { '^/api/auth': '' }, 
             onProxyReq: (proxyReq, req, res) => {
+                // 1. Inject the VIP Wristband (Secret Key)
+                proxyReq.setHeader('x-nexus-secret', process.env.NEXUS_INTERNAL_SECRET);
                 if (req.user) {
                     proxyReq.setHeader('x-user-id', req.user.id); 
                 }
@@ -37,6 +39,10 @@ const setupProxies = (app) => {
             target: 'http://localhost:4000',
             changeOrigin: true,
             pathRewrite: { '^/api/auth': '' },
+            onProxyReq: (proxyReq, req, res) => {
+                // 1. Inject the VIP Wristband (Secret Key)
+                proxyReq.setHeader('x-nexus-secret', process.env.NEXUS_INTERNAL_SECRET);
+            },
             onError: (err, req, res) => res.status(502).json({ error: "Auth Service Down" })
         })
     );
@@ -55,6 +61,8 @@ const setupProxies = (app) => {
             changeOrigin: true,
             pathRewrite: { '^/api/resume': '' },
             onProxyReq: (proxyReq, req, res) => {
+                // 1. Inject the VIP Wristband (Secret Key)
+                proxyReq.setHeader('x-nexus-secret', process.env.NEXUS_INTERNAL_SECRET);
                 if (req.user) {
                     proxyReq.setHeader('x-user-id', req.user.id);
                     proxyReq.setHeader('x-user-plan', req.user.plan || 'free'); 
@@ -74,6 +82,8 @@ const setupProxies = (app) => {
             changeOrigin: true,
             pathRewrite: { '^/api/resume': '' },
             onProxyReq: (proxyReq, req, res) => {
+                // 1. Inject the VIP Wristband (Secret Key)
+                proxyReq.setHeader('x-nexus-secret', process.env.NEXUS_INTERNAL_SECRET);
                 if (req.user) {
                     proxyReq.setHeader('x-user-id', req.user.id);
                     proxyReq.setHeader('x-user-email', req.user.email);
@@ -98,6 +108,8 @@ const setupProxies = (app) => {
             pathRewrite: { '^/api/ats': '' },
             onProxyReq: (proxyReq, req, res) => {
                 // Ensure headers are preserved for file uploads
+                // 1. Inject the VIP Wristband (Secret Key)
+                proxyReq.setHeader('x-nexus-secret', process.env.NEXUS_INTERNAL_SECRET);
                 if (req.headers['content-type']) {
                     proxyReq.setHeader('Content-Type', req.headers['content-type']);
                 }
@@ -122,6 +134,10 @@ const setupProxies = (app) => {
             target: 'http://localhost:6000',
             changeOrigin: true,
             pathRewrite: { '^/api/compiler': '' },
+            onProxyReq: (proxyReq, req, res) => {
+                // 1. Inject the VIP Wristband (Secret Key)
+                proxyReq.setHeader('x-nexus-secret', process.env.NEXUS_INTERNAL_SECRET);
+            },
             onError: (err, req, res) => res.status(502).json({ error: "Compiler Service Down" })
         })
     );
@@ -139,6 +155,8 @@ const setupProxies = (app) => {
             changeOrigin: true,
             pathRewrite: { '^/api/payment': '' }, // Becomes /create-checkout-session
             onProxyReq: (proxyReq, req, res) => {
+                // 1. Inject the VIP Wristband (Secret Key)
+                proxyReq.setHeader('x-nexus-secret', process.env.NEXUS_INTERNAL_SECRET);
                 if (req.user) {
                     proxyReq.setHeader('x-user-id', req.user.id);
                     proxyReq.setHeader('x-user-email', req.user.email);
@@ -156,6 +174,11 @@ const setupProxies = (app) => {
             target: 'http://localhost:9000',
             changeOrigin: true,
             pathRewrite: { '^/api/payment': '' }, // Becomes /webhook
+            onProxyReq: (proxyReq, req, res) => {
+                // 1. MUST Inject the Secret (Even for public webhooks!)
+                // The Payment Service trusts the Gateway, not Stripe directly.
+                proxyReq.setHeader('x-nexus-secret', process.env.NEXUS_INTERNAL_SECRET);
+            },
             onError: (err, req, res) => res.status(502).json({ error: "Payment Service Down" })
         })
     );

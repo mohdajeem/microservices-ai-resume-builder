@@ -21,5 +21,5 @@ const createLimiter = (windowMs, max, message) => {
 
 // 3. Define Limits
 export const authLimiter = createLimiter(15 * 60 * 1000, 10, "Too many login attempts."); // 10 per 15 min
-export const aiLimiter = createLimiter(60 * 1000, 10, "AI limit reached. Wait 1 min."); // 5 per 1 min
+export const aiLimiter = createLimiter(60 * 1000, 10, "AI limit reached. Wait 1 min."); // 10 per 1 min
 export const generalLimiter = createLimiter(60 * 1000, 100, "Server busy.");

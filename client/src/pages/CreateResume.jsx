@@ -8,6 +8,8 @@ import {
     ArrowRight, ArrowLeft, UploadCloud, FileText, Layout, Loader2, Award, Star,
     Save 
 } from 'lucide-react';
+import { useToast } from '../context/ToastContext';
+
 
 const STEPS = [
   { id: 1, title: 'Personal Info', icon: User },

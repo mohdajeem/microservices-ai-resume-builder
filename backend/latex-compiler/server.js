@@ -1,6 +1,10 @@
 import express from 'express';
 import morgan from 'morgan';
+import dotenv from 'dotenv';
 import { compileLatexToPdf } from "./src/compileLatex.js";
+import { requireInternal } from './src/middleware/requireInternal.js';
+
+dotenv.config();
 
 const app = express();
 
@@ -10,6 +14,8 @@ app.use(morgan("dev"));
 app.get("/health", (req, res) => {
     res.json({status: "ok"});
 });
+
+app.use(requireInternal);
 
 app.post("/compile",async (req, res) => {
     try{

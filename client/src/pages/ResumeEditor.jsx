@@ -110,6 +110,32 @@ const ResumeEditor = () => {
     }
   };
 
+  // download the resume
+  const handleDownload = () => {
+    if (!pdfUrl) {
+        toast.error("No PDF generated yet to download.");
+        return;
+    }
+
+    // Create a temporary link element
+    const link = document.createElement('a');
+    link.href = pdfUrl;
+    
+    // Set filename (use the version name or a default)
+    const fileName = resumeData?.versionName 
+        ? `${resumeData.versionName.replace(/\s+/g, '_')}.pdf` 
+        : "resume.pdf";
+        
+    link.download = fileName;
+    
+    // Append to body, click, and remove
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success("Download started!");
+  };
+
   // --- HELPERS ---
   const updateContent = (callback) => {
       const newData = JSON.parse(JSON.stringify(resumeData));
@@ -380,7 +406,7 @@ const ResumeEditor = () => {
             </Button>
             <Button variant="outline" onClick={() => setShowAtsModal(true)} className="h-9 px-4 border-indigo-200 text-indigo-600 hover:bg-indigo-50"><Target size={16} className="mr-2" /> Target Match</Button>
             <Button variant="ghost" onClick={() => handleSave()} disabled={saving} className="h-9 px-4 text-gray-600">{saving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} className="mr-2" />} Save</Button>
-            <Button onClick={() => {}} disabled={!pdfUrl || compiling} className="h-9 px-4"><Download size={18} className="mr-2" /> Download</Button>
+            <Button onClick={handleDownload} disabled={!pdfUrl || compiling} className="h-9 px-4"><Download size={18} className="mr-2" /> Download</Button>
         </div>
       </header>
 
