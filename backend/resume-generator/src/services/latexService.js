@@ -43,10 +43,31 @@ export const generateLatexString = (data) => {
     fullLatex += `    ${escapeLatex(p.location)} \\\\ \\vspace{1pt}\n`;
   }
 
+  // Helper: Removes 'https://' and 'www.' for cleaner display
+  const stripProtocol = (url) => {
+    if (!url) return "";
+    return url.replace(/^(https?:\/\/)?(www\.)?/, "").replace(/\/$/, ""); // Removes protocol, www, and trailing slash
+  };
+
   // Contact Info Line
   let contactParts = [];
   if (p.phone) contactParts.push(`\\small \\underline{\\href{tel:${p.phone}}{${escapeLatex(p.phone)}}}`);
   if (p.email) contactParts.push(`\\underline{\\href{mailto:${p.email}}{${escapeLatex(p.email)}}}`);
+
+
+  /* IT makes resume ugly, will not implement
+  
+              // LINKEDIN: Strip 'https://www.' for display, but keep full URL for click
+              // Display: linkedin.com/in/mohd-ajeem...
+              // Link:    https://www.linkedin.com/in/mohd-ajeem...
+              if (p.linkedin) {
+                const displayLinkedin = stripProtocol(p.linkedin); 
+                contactParts.push(`\\underline{\\href{${p.linkedin}}{${escapeLatex(displayLinkedin)}}}`);
+              }
+              // if (p.linkedin) contactParts.push(`\\underline{\\href{${p.linkedin}}{${escapeLatex(p.linkedin)}}}`);
+              if (p.github) contactParts.push(`\\underline{\\href{${p.github}}{${escapeLatex(p.github)}}}`);
+  */
+
   if (p.linkedin) contactParts.push(`\\underline{\\href{${p.linkedin}}{LinkedIn}}`);
   if (p.github) contactParts.push(`\\underline{\\href{${p.github}}{GitHub}}`);
   if (p.portfolio) contactParts.push(`\\underline{\\href{${p.portfolio}}{Portfolio}}`);

@@ -154,7 +154,7 @@ const Dashboard = () => {
         )}
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
             <div 
                 onClick={() => navigate('/ats-check')}
                 className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-6 text-white cursor-pointer hover:shadow-lg transition-all relative overflow-hidden group"
@@ -172,6 +172,15 @@ const Dashboard = () => {
                 <div className="relative z-10">
                     <h3 className="text-2xl font-bold mb-1">AI Auditor</h3>
                     <p className="text-white/80 text-sm">Deep analysis & line-by-line rewrite suggestions</p>
+                </div>
+            </div>
+            <div 
+                onClick={() => navigate('/mock-interview')}
+                className="bg-gradient-to-br from-[#00c29f] to-teal-700 rounded-2xl p-6 text-white cursor-pointer hover:shadow-lg transition-all relative overflow-hidden group"
+            >
+                <div className="relative z-10">
+                    <h3 className="text-2xl font-bold mb-1">AI Mock Interview</h3>
+                    <p className="text-white/80 text-sm">Practice AI Mock Interview according to JD and resume</p>
                 </div>
             </div>
         </div>

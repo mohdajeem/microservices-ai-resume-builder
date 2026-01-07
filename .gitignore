@@ -4,6 +4,7 @@
 # But include these folders
 !/backend/
 !/client/
+!/learning/
 !/.gitignore
 !/README.md
 
@@ -14,8 +15,8 @@
 **/.env.production
 
 # Ignore docs folders
-**/docs/
-backend/docs/
+# **/docs/
+# backend/docs/
 
 # Ignore build outputs
 **/dist/

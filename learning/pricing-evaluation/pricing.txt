@@ -1,0 +1,12 @@
+1. blurred
+2. pricing is wallet based 49 credits, 99 credits
+
+we can make our service in 2 options
+1. credit based 
+2. subscription based
+
+at the pricing section we would show will show a switch button
+if we click it switch to subscription and again click then switch to credit based
+
+both credit based and switch based have different options and features
+

@@ -182,6 +182,21 @@ const setupProxies = (app) => {
             onError: (err, req, res) => res.status(502).json({ error: "Payment Service Down" })
         })
     );
+
+    // --- 7. INTERVIEW SERVICE ---
+    app.use(
+        '/api/interview',
+        verifyToken, // Protect this route!
+        createProxyMiddleware({
+            target: 'http://localhost:8001',
+            changeOrigin: true,
+            pathRewrite: { '^/api/interview': '' },
+            onProxyReq: (proxyReq, req, res) => {
+                if (req.user) proxyReq.setHeader('x-user-id', req.user.id);
+            }
+        })
+    );
+    
 };
 
 export default setupProxies;

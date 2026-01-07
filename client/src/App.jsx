@@ -13,6 +13,7 @@ import AIAudit from './pages/AIAudit';
 import ImportResume from './pages/ImportResume';
 import Settings from './pages/Settings';
 import PricingPage from './pages/PricingPage';
+import MockInterview from './pages/MockInterview';
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
@@ -38,6 +39,7 @@ const App = () => {
       <Route path="/ai-audit" element={<ProtectedRoute><AIAudit /></ProtectedRoute>} />
       <Route path="/import-resume" element={<ProtectedRoute><ImportResume /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+      <Route path="/mock-interview" element={<MockInterview />} />
       
       {/* 2. ADD THIS ROUTE */}
       <Route path="/pricing" element={<ProtectedRoute><PricingPage /></ProtectedRoute>} />
