@@ -7,8 +7,8 @@
 !/learning/
 !/.gitignore
 !/README.md
-!/docker-compose.yml
 !/Dockerfile.prod.example
+!/docker-compose.example.yml
 !/.github/
 
 # Ignore node_modules in included folders
