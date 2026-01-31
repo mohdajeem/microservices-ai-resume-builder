@@ -12,7 +12,7 @@ const setupProxies = (app) => {
         ['/api/auth/password', '/api/auth/me'], 
         verifyToken, 
         createProxyMiddleware({
-            target: 'http://localhost:4000',
+            target: process.env.AUTH_SERVICE_URL || 'http://localhost:4000',
             changeOrigin: true,
             pathRewrite: { '^/api/auth': '' }, 
             onProxyReq: (proxyReq, req, res) => {
@@ -36,7 +36,7 @@ const setupProxies = (app) => {
         '/api/auth',
         generalLimiter,
         createProxyMiddleware({
-            target: 'http://localhost:4000',
+            target: process.env.AUTH_SERVICE_URL || 'http://localhost:4000',
             changeOrigin: true,
             pathRewrite: { '^/api/auth': '' },
             onProxyReq: (proxyReq, req, res) => {
@@ -57,7 +57,7 @@ const setupProxies = (app) => {
         aiLimiter, 
         verifyToken,
         createProxyMiddleware({
-            target: 'http://localhost:5000',
+            target: process.env.RESUME_GENERATOR_URL || 'http://localhost:5000',
             changeOrigin: true,
             pathRewrite: { '^/api/resume': '' },
             onProxyReq: (proxyReq, req, res) => {
@@ -78,7 +78,7 @@ const setupProxies = (app) => {
         generalLimiter, 
         verifyToken,
         createProxyMiddleware({
-            target: 'http://localhost:5000',
+            target: process.env.RESUME_GENERATOR_URL || 'http://localhost:5000',
             changeOrigin: true,
             pathRewrite: { '^/api/resume': '' },
             onProxyReq: (proxyReq, req, res) => {
@@ -103,7 +103,7 @@ const setupProxies = (app) => {
         verifyToken,
         // checkTier('pro'), // <--- BLOCKS FREE USERS
         createProxyMiddleware({
-            target: 'http://localhost:7000',
+            target: process.env.ATS_SERVICE_URL || 'http://localhost:7000',
             changeOrigin: true,
             pathRewrite: { '^/api/ats': '' },
             onProxyReq: (proxyReq, req, res) => {
@@ -131,7 +131,7 @@ const setupProxies = (app) => {
         verifyToken,
         // checkTier('pro'), // Uncomment to enforce payment for PDF
         createProxyMiddleware({
-            target: 'http://localhost:6000',
+            target: process.env.LATEX_COMPILER_URL || 'http://localhost:6000',
             changeOrigin: true,
             pathRewrite: { '^/api/compiler': '' },
             onProxyReq: (proxyReq, req, res) => {
@@ -151,7 +151,7 @@ const setupProxies = (app) => {
         '/api/payment/create-checkout-session',
         verifyToken, 
         createProxyMiddleware({
-            target: 'http://localhost:9000',
+            target: process.env.PAYMENT_SERVICE_URL || 'http://localhost:9000',
             changeOrigin: true,
             pathRewrite: { '^/api/payment': '' }, // Becomes /create-checkout-session
             onProxyReq: (proxyReq, req, res) => {
@@ -171,7 +171,7 @@ const setupProxies = (app) => {
     app.use(
         '/api/payment/webhook',
         createProxyMiddleware({
-            target: 'http://localhost:9000',
+            target: process.env.PAYMENT_SERVICE_URL || 'http://localhost:9000',
             changeOrigin: true,
             pathRewrite: { '^/api/payment': '' }, // Becomes /webhook
             onProxyReq: (proxyReq, req, res) => {
@@ -188,7 +188,7 @@ const setupProxies = (app) => {
         '/api/interview',
         verifyToken, // Protect this route!
         createProxyMiddleware({
-            target: 'http://localhost:8001',
+            target: process.env.INTERVIEW_SERVICE_URL || 'http://localhost:8001',
             changeOrigin: true,
             pathRewrite: { '^/api/interview': '' },
             onProxyReq: (proxyReq, req, res) => {
