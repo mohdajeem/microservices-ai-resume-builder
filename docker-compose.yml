@@ -1,0 +1,150 @@
+services:
+  # Databases
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+  # Backend Services
+  gateway:
+    build: ./backend/gateway
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/gateway:/app
+      - /app/node_modules
+    command: npm run dev
+    environment:
+      - PORT=8000
+      - MONGO_URI=mongodb://mongodb:27017/nexus
+      - REDIS_URL=redis://redis:6379
+      - AUTH_SERVICE_URL=http://auth-service:4000
+      - ATS_SERVICE_URL=http://ats-service:7000
+      - RESUME_GENERATOR_URL=http://resume-generator:5000
+      - INTERVIEW_SERVICE_URL=http://interview-service:8001
+      - PAYMENT_SERVICE_URL=http://payment-service:9000
+      - LATEX_COMPILER_URL=http://latex-compiler:6000
+      - JWT_SECRET=Ajeemjljis
+      - NEXUS_INTERNAL_SECRET=nexus_superSEcRetAjeem
+      - FRONTEND_URL=http://localhost:5173
+    depends_on:
+      - mongodb
+      - redis
+
+  auth-service:
+    build: ./backend/auth-service
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./backend/auth-service:/app
+      - /app/node_modules
+    command: npm run dev
+    environment:
+      - PORT=4000
+      - MONGO_URI=mongodb://mongodb:27017/auth_db
+      - JWT_SECRET=Ajeemjljis
+      - NEXUS_INTERNAL_SECRET=nexus_superSEcRetAjeem
+    depends_on:
+      - mongodb
+
+  ats-service:
+    build: ./backend/ats-service
+    ports:
+      - "7000:7000"
+    volumes:
+      - ./backend/ats-service:/app
+      - /app/node_modules
+    command: npm run dev
+    environment:
+      - PORT=7000
+      - MONGO_URI=mongodb://mongodb:27017/ats_db
+      - GEMINI_API_KEY=AIzaSyD0K7PW7NshO7CBXU4uIOhppx8cfdgluHs
+      - NEXUS_INTERNAL_SECRET=nexus_superSEcRetAjeem
+    depends_on:
+      - mongodb
+
+  interview-service:
+    build: ./backend/interview-service
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./backend/interview-service:/app
+      - /app/node_modules
+    command: npm run dev
+    environment:
+      - PORT=8001
+      - MONGO_URI=mongodb://mongodb:27017/interview_db
+      - GEMINI_API_KEY=AIzaSyD0K7PW7NshO7CBXU4uIOhppx8cfdgluHs
+      - NEXUS_INTERNAL_SECRET=nexus_superSEcRetAjeem
+    depends_on:
+      - mongodb
+
+  payment-service:
+    build: ./backend/payment-service
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./backend/payment-service:/app
+      - /app/node_modules
+    command: npm run dev
+    environment:
+      - PORT=9000
+      - MONGO_URI=mongodb://mongodb:27017/payment_db
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - NEXUS_INTERNAL_SECRET=${NEXUS_INTERNAL_SECRET}
+    depends_on:
+      - mongodb
+
+  latex-compiler:
+    build: ./backend/latex-compiler
+    ports:
+      - "6000:6000"
+    volumes:
+      - ./backend/latex-compiler:/app
+      - /app/node_modules
+    command: npm run dev
+    environment:
+      - PORT=6000
+      - NEXUS_INTERNAL_SECRET=nexus_superSEcRetAjeem
+
+  resume-generator:
+    build: ./backend/resume-generator
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend/resume-generator:/app
+      - /app/node_modules
+    command: npm run dev
+    environment:
+      - PORT=5000
+      - MONGO_URI=mongodb://mongodb:27017/resume_db
+      - GEMINI_API_KEY=AIzaSyD0K7PW7NshO7CBXU4uIOhppx8cfdgluHs
+      - NEXUS_INTERNAL_SECRET=nexus_superSEcRetAjeem
+    depends_on:
+      - mongodb
+
+  # Frontend
+  client:
+    build: ./client
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    command: npm run dev -- --host
+    environment:
+      - VITE_API_GATEWAY_URL=http://localhost:8000
+      # - VITE_API_GATEWAY_URL=http://localhost:8000
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - gateway
+
+volumes:
+  mongodb_data:

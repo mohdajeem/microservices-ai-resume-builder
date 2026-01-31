@@ -1,0 +1,40 @@
+# Stage 1: Build
+FROM node:20-slim AS builder
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install ALL dependencies (including devDependencies if needed for build steps)
+RUN npm install
+
+# Copy source code
+COPY . .
+
+# Run build if the service has one (e.g., frontend or compiled TS)
+# RUN npm run build
+
+# Stage 2: Production
+FROM node:20-slim
+
+WORKDIR /app
+
+# Set production environment
+ENV NODE_ENV=production
+
+# Install only production dependencies
+COPY package*.json ./
+RUN npm install --omit=dev
+
+# Copy compiled/source files from builder stage
+COPY --from=builder /app .
+
+# Security: Run as non-root user
+USER node
+
+# Expose the port (change per service)
+# EXPOSE 8000
+
+# Start the application
+CMD ["npm", "start"]
