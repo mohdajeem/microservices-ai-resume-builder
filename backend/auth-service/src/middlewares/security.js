@@ -5,13 +5,15 @@
  */
 export const mongoSanitize = (req, res, next) => {
   const sanitize = (obj) => {
-    if (!obj || typeof obj !== 'object') return;
+    if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return;
 
     for (let key in obj) {
-      if (key.startsWith('$') || key.includes('.')) {
-        delete obj[key]; // Delete the dangerous key
-      } else {
-        sanitize(obj[key]); // Recursively clean nested objects
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        if (key.startsWith('$') || key.includes('.')) {
+          delete obj[key]; // Delete the dangerous key
+        } else {
+          sanitize(obj[key]); // Recursively clean nested objects
+        }
       }
     }
   };

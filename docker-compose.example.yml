@@ -13,6 +13,23 @@ services:
       - "6379:6379"
 
   # Backend Services
+  ai-orchestrator:
+    build: ./backend/ai-service
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./backend/ai-service:/app
+      - /app/node_modules
+    command: npm run dev
+    environment:
+      - PORT=5001
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - DEFAULT_AI_PROVIDER=${DEFAULT_AI_PROVIDER}
+      - GEMINI_MODEL=${GEMINI_MODEL}
+      - GROQ_MODEL=${GROQ_MODEL}
+      - NEXUS_INTERNAL_SECRET=${NEXUS_INTERNAL_SECRET}
+
   gateway:
     build: ./backend/gateway
     ports:
@@ -65,10 +82,11 @@ services:
     environment:
       - PORT=7000
       - MONGO_URI=mongodb://mongodb:27017/ats_db
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - AI_SERVICE_URL=http://ai-orchestrator:5001/api/ai
       - NEXUS_INTERNAL_SECRET=${NEXUS_INTERNAL_SECRET}
     depends_on:
       - mongodb
+      - ai-orchestrator
 
   interview-service:
     build: ./backend/interview-service
@@ -125,10 +143,12 @@ services:
     environment:
       - PORT=5000
       - MONGO_URI=mongodb://mongodb:27017/resume_db
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - AI_SERVICE_URL=http://ai-orchestrator:5001/api/ai
       - NEXUS_INTERNAL_SECRET=${NEXUS_INTERNAL_SECRET}
+      - LATEX_COMPILER_URL=http://latex-compiler:6000
     depends_on:
       - mongodb
+      - ai-orchestrator
 
   # Frontend
   client:

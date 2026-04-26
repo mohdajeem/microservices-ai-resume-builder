@@ -22,12 +22,33 @@ const escapeLatex = (str) => {
     .replace(/[\r\n]+/g, " "); // Flatten newlines
 };
 
+// Helper: Escape URL for inclusion in \href{URL}{TEXT}
+// Prevents command injection like: https://google.com}{}{}\input{/etc/passwd}
+const sanitizeUrl = (url) => {
+  if (!url) return "";
+  // 1. Remove basic control characters and trim
+  let cleanUrl = String(url).trim().replace(/[\v\f\x00-\x1F\x7F]/g, "");
+  
+  // 2. Escape LaTeX special characters that can break \href command balance
+  // Specifically: { } \ % 
+  return cleanUrl
+    .replace(/\\/g, '\\textbackslash{}')
+    .replace(/%/g, '\\%')
+    .replace(/{/g, '\\{')
+    .replace(/}/g, '\\}');
+};
+
 export const generateLatexString = (data) => {
   const templatePath = path.join(__dirname, '../templates/template.tex');
   let template = fs.readFileSync(templatePath, 'utf8');
   const content = data.content || {}; 
+  const isCompact = data.compactMode === true;
 
   let fullLatex = "";
+
+  if (isCompact) {
+    fullLatex += `\\compactMode\n\n`;
+  }
 
   // ---------------------------------------------------------
   // 1. HEADER (Safe Construction)
@@ -51,8 +72,8 @@ export const generateLatexString = (data) => {
 
   // Contact Info Line
   let contactParts = [];
-  if (p.phone) contactParts.push(`\\small \\underline{\\href{tel:${p.phone}}{${escapeLatex(p.phone)}}}`);
-  if (p.email) contactParts.push(`\\underline{\\href{mailto:${p.email}}{${escapeLatex(p.email)}}}`);
+  if (p.phone) contactParts.push(`\\small \\underline{\\href{tel:${sanitizeUrl(p.phone)}}{${escapeLatex(p.phone)}}}`);
+  if (p.email) contactParts.push(`\\underline{\\href{mailto:${sanitizeUrl(p.email)}}{${escapeLatex(p.email)}}}`);
 
 
   /* IT makes resume ugly, will not implement
@@ -68,50 +89,28 @@ export const generateLatexString = (data) => {
               if (p.github) contactParts.push(`\\underline{\\href{${p.github}}{${escapeLatex(p.github)}}}`);
   */
 
-  if (p.linkedin) contactParts.push(`\\underline{\\href{${p.linkedin}}{LinkedIn}}`);
-  if (p.github) contactParts.push(`\\underline{\\href{${p.github}}{GitHub}}`);
-  if (p.portfolio) contactParts.push(`\\underline{\\href{${p.portfolio}}{Portfolio}}`);
+  if (p.linkedin) contactParts.push(`\\underline{\\href{${sanitizeUrl(p.linkedin)}}{LinkedIn}}`);
+  if (p.github) contactParts.push(`\\underline{\\href{${sanitizeUrl(p.github)}}{GitHub}}`);
+  if (p.portfolio) contactParts.push(`\\underline{\\href{${sanitizeUrl(p.portfolio)}}{Portfolio}}`);
 
   if (contactParts.length > 0) {
     fullLatex += `    ${contactParts.join(" ~ ")}\n`;
   }
   
-  fullLatex += `\\end{center}\n\\vspace{-4pt}\n\n`;
+  fullLatex += `\\end{center}\n\\vspace{-8pt}\n\n`;
 
   // ---------------------------------------------------------
-  // 2. PROJECTS (Conditional)
+  // 1.5. PROFESSIONAL SUMMARY (New Section)
   // ---------------------------------------------------------
-  const projects = (content.projects || []).filter(p => p.title && p.title.trim().length > 0);
-  
-  if (projects.length > 0) {
-    fullLatex += `%-----------PROJECTS-----------\n`;
-    fullLatex += `\\section{PROJECTS}\n`;
-    fullLatex += `\\resumeSubHeadingListStart\n`;
-
-    projects.forEach(proj => {
-      const linkCmd = proj.link 
-        ? `\\href{${proj.link}}{\\underline{\\textbf{\\large{${escapeLatex(proj.title)}}}}}`
-        : `\\underline{\\textbf{\\large{${escapeLatex(proj.title)}}}}`;
-
-      fullLatex += `\\resumeProjectHeading\n`;
-      fullLatex += `  {${linkCmd} $|$ \\large{${escapeLatex(proj.tech)}}}{${escapeLatex(proj.date)}}\n`;
-
-      const validPoints = (proj.points || []).filter(pt => pt && pt.trim().length > 0);
-      if (validPoints.length > 0) {
-        fullLatex += `  \\resumeItemListStart\n`;
-        validPoints.forEach(pt => {
-          fullLatex += `    \\resumeItem{${escapeLatex(pt)}}\n`;
-        });
-        fullLatex += `  \\resumeItemListEnd\n`;
-      }
-      fullLatex += `\\vspace{-1pt}\n`;
-    });
-
-    fullLatex += `\\resumeSubHeadingListEnd\n\n`;
+  if (p.summary && p.summary.trim().length > 0) {
+    fullLatex += `\\section{Professional Summary}\n`;
+    fullLatex += `\\small\\raggedright\n`;
+    fullLatex += `${escapeLatex(p.summary)}\n`;
+    fullLatex += `\\vspace{-2pt}\n\n`;
   }
 
   // ---------------------------------------------------------
-  // 3. EXPERIENCE (Conditional)
+  // 2. EXPERIENCE (Conditional) - REORDERED: EXPERIENCE FIRST
   // ---------------------------------------------------------
   const experience = (content.experience || []).filter(e => e.company && e.company.trim().length > 0);
 
@@ -139,6 +138,36 @@ export const generateLatexString = (data) => {
   }
 
   // ---------------------------------------------------------
+  // 3. PROJECTS (Conditional) - REORDERED: PROJECTS SECOND
+  // ---------------------------------------------------------
+  const projects = (content.projects || []).filter(p => p.title && p.title.trim().length > 0);
+
+  if (projects.length > 0) {
+    fullLatex += `%-----------PROJECTS-----------\n`;
+    fullLatex += `\\section{PROJECTS}\n`;
+    fullLatex += `\\resumeSubHeadingListStart\n`;
+
+    projects.forEach(proj => {
+      const linkLabel = proj.link ? `\\href{${sanitizeUrl(proj.link)}}{\\underline{${escapeLatex(proj.title)}}}` : escapeLatex(proj.title);
+      
+      fullLatex += `\\resumeProjectHeading\n`;
+      fullLatex += `  {\\textbf{\\large ${linkLabel}} $|$ \\large ${escapeLatex(proj.tech)}}{${escapeLatex(proj.date)}}\n`;
+
+      const validPoints = (proj.points || []).filter(pt => pt && pt.trim().length > 0);
+      if (validPoints.length > 0) {
+        fullLatex += `  \\resumeItemListStart\n`;
+        validPoints.forEach(pt => {
+          fullLatex += `    \\resumeItem{${escapeLatex(pt)}}\n`;
+        });
+        fullLatex += `  \\resumeItemListEnd\n`;
+      }
+      fullLatex += `\\vspace{-1pt}\n`;
+    });
+
+    fullLatex += `\\resumeSubHeadingListEnd\n\n`;
+  }
+
+  // ---------------------------------------------------------
   // 4. SKILLS (Conditional)
   // ---------------------------------------------------------
   const s = content.skills || {};
@@ -156,6 +185,7 @@ export const generateLatexString = (data) => {
   addSkillLine("Tools", s.tools);
   addSkillLine("Databases", s.databases);
   addSkillLine("Core Concepts", s.core_concepts);
+  addSkillLine("Additional", s.additional_skills);
 
   if (skillLines.length > 0) {
     fullLatex += `%-----------SKILLS-----------\n`;

@@ -5,26 +5,44 @@
 !/backend/
 !/client/
 !/learning/
+!/.github/
+
+# Root files to include
 !/.gitignore
 !/README.md
 !/Dockerfile.prod.example
 !/docker-compose.example.yml
-!/.github/
+docker-compose.yml
+!/INTERVIEW_PREP_SYLLABUS.md
+!/RESUME_BULLET_POINTS.md
+!/TECHNICAL_DEEP_DIVE_ANSWERS.md
+!/test_ai_service.py
 
-# Ignore node_modules in included folders
-**/node_modules/
+# Environment files - CRITICAL: Never commit .env files
 **/.env
-**/.env.local
-**/.env.production
+**/.env.*
+!**/.env.example
 
-# Ignore docs folders
-# **/docs/
-# backend/docs/
+# Node modules
+**/node_modules/
+**/package-lock.json
 
-# Ignore build outputs
+# Build and IDE outputs
 **/dist/
 **/build/
+**/.vs/
+**/.vscode/
+**/target/
+**/out/
 
-# Ignore OS files
+# System files
 .DS_Store
 Thumbs.db
+
+# Service specific ignores
+**/renders/
+**/pdf-parsing-worker/node_modules/
+
+INTERVIEW_PREP_SYLLABUS.md
+RESUME_BULLET_POINTS.md
+TECHNICAL_DEEP_DIVE_ANSWERS.md

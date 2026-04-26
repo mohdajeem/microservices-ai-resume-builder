@@ -1,15 +1,23 @@
-import React, { useState } from 'react';
-import { atsAPI } from '../lib/api';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { atsAPI, resumeAPI } from '../lib/api';
 import { Button } from '../components/ui/Button';
 import { TextArea } from '../components/ui/TextArea';
-import { UploadCloud, CheckCircle, AlertCircle, FileText, X } from 'lucide-react';
+import { UploadCloud, CheckCircle, AlertCircle, FileText, X, History } from 'lucide-react';
 
 const ATSScanner = () => {
+  const [searchParams] = useSearchParams();
+  const resumeId = searchParams.get('resumeId');
+  
   const [file, setFile] = useState(null);
   const [jd, setJd] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [history, setHistory] = useState([]);
   const [error, setError] = useState('');
+
+  // 1. If we have a resumeId, we could optionally fetch it to show info
+  // or just use the ID for the scan request.
 
   const handleFileChange = (e) => {
     const selected = e.target.files[0];
@@ -34,9 +42,11 @@ const ATSScanner = () => {
       const formData = new FormData();
       formData.append('resume', file);
       formData.append('jd', jd);
+      if (resumeId) formData.append('resumeId', resumeId);
 
       const res = await atsAPI.analyze(formData);
-      setResult(res.data); // Expecting: { ats_score, summary, strengths, improvements }
+      // Backend now returns { success, data } or { success, cached, data }
+      setResult(res.data.data); 
     } catch (err) {
       setError("Analysis failed. Please try again.");
     } finally {

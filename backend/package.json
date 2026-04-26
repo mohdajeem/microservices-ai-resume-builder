@@ -1,0 +1,17 @@
+{
+  "name": "nexus-backend-tests",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "cross-env NODE_ENV=test mocha tests/**/*.test.js --timeout 10000 --exit",
+    "test:unit": "cross-env NODE_ENV=test mocha tests/unit/**/*.test.js --exit",
+    "test:integration": "cross-env NODE_ENV=test mocha tests/integration/**/*.test.js --exit"
+  },
+  "dependencies": {
+    "chai": "^4.3.10",
+    "cross-env": "^7.0.3",
+    "express": "^5.2.1",
+    "mocha": "^10.2.0",
+    "supertest": "^6.3.3"
+  }
+}

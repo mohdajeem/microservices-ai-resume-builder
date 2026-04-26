@@ -25,8 +25,9 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    
+    console.log("req.body in auth: ", email," | ",password);
     const user = await User.findOne({ email });
+    console.log("user: ", user);
     if (!user) return res.status(404).json({ error: "User not found" });
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -43,7 +44,7 @@ export const login = async (req, res) => {
       { 
         id: user._id, 
         email: user.email,
-        plan: user.subscription.plan // <--- EMBED PLAN HERE
+        plan: user.subscription?.plan || 'free' // <--- SAFE NAVIGATION
       }, 
       process.env.JWT_SECRET, 
       { expiresIn: '7d' }

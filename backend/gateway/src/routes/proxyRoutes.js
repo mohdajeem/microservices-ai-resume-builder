@@ -41,7 +41,9 @@ const setupProxies = (app) => {
             pathRewrite: { '^/api/auth': '' },
             onProxyReq: (proxyReq, req, res) => {
                 // 1. Inject the VIP Wristband (Secret Key)
-                proxyReq.setHeader('x-nexus-secret', process.env.NEXUS_INTERNAL_SECRET);
+                const secret = process.env.NEXUS_INTERNAL_SECRET;
+                console.log(`GATEWAY DEBUG: Sending Secret: [${secret}]`);
+                proxyReq.setHeader('x-nexus-secret', secret);
             },
             onError: (err, req, res) => res.status(502).json({ error: "Auth Service Down" })
         })
@@ -51,7 +53,30 @@ const setupProxies = (app) => {
     // 3. RESUME GENERATOR ROUTES
     // ----------------------------------------------------------
 
-    // A. STRICT ROUTES (AI Audit) - AI Usage Gate
+    // A. PRIORITY ROUTE: AI Audit (Avoids catch-all /api/resume conflict)
+    app.use(
+        '/api/resume/compact-ai', 
+        aiLimiter, 
+        verifyToken,
+        createProxyMiddleware({
+            target: process.env.RESUME_GENERATOR_URL || 'http://localhost:5000',
+            changeOrigin: true,
+            pathRewrite: { '^/api/resume/compact-ai': '/compact-ai' }, // Use simple rewrite back
+            onProxyReq: (proxyReq, req, res) => {
+                console.log(`[GATEWAY COMPACT DEBUG] Method: ${req.method}, URL: ${req.url}`);
+                proxyReq.setHeader('x-nexus-secret', process.env.NEXUS_INTERNAL_SECRET || 'nexus_secret_2024');
+                if (req.user) {
+                    proxyReq.setHeader('x-user-id', req.user.id);
+                    proxyReq.setHeader('x-user-plan', req.user.plan || 'free'); 
+                }
+            },
+            onError: (err, req, res) => {
+                console.error(`[GATEWAY] ❌ Compact Proxy Error: ${err.message}`);
+                res.status(502).json({ error: "Resume Service Down" });
+            }
+        })
+    );
+
     app.use(
         '/api/resume/audit', 
         aiLimiter, 
@@ -61,14 +86,11 @@ const setupProxies = (app) => {
             changeOrigin: true,
             pathRewrite: { '^/api/resume': '' },
             onProxyReq: (proxyReq, req, res) => {
-                // 1. Inject the VIP Wristband (Secret Key)
                 proxyReq.setHeader('x-nexus-secret', process.env.NEXUS_INTERNAL_SECRET);
                 if (req.user) {
                     proxyReq.setHeader('x-user-id', req.user.id);
-                    proxyReq.setHeader('x-user-plan', req.user.plan || 'free'); 
                 }
-            },
-            onError: (err, req, res) => res.status(502).json({ error: "Resume Service Down" })
+            }
         })
     );
 
@@ -82,7 +104,7 @@ const setupProxies = (app) => {
             changeOrigin: true,
             pathRewrite: { '^/api/resume': '' },
             onProxyReq: (proxyReq, req, res) => {
-                // 1. Inject the VIP Wristband (Secret Key)
+                console.log(`[GATEWAY] 🚀 Proxying Resume Request: ${req.method} ${req.url} -> ${proxyReq.path}`);
                 proxyReq.setHeader('x-nexus-secret', process.env.NEXUS_INTERNAL_SECRET);
                 if (req.user) {
                     proxyReq.setHeader('x-user-id', req.user.id);
@@ -90,23 +112,50 @@ const setupProxies = (app) => {
                     proxyReq.setHeader('x-user-plan', req.user.plan || 'free');
                 }
             },
-            onError: (err, req, res) => res.status(502).json({ error: "Resume Service Down" })
+            onError: (err, req, res) => {
+                console.error(`[GATEWAY] ❌ Resume Proxy Error: ${err.message}`);
+                res.status(502).json({ error: "Resume Service Down" });
+            }
         })
     );
 
     // ----------------------------------------------------------
     // 4. ATS SERVICE (Pro Feature) - Tier Gate
     // ----------------------------------------------------------
+    // A. Priority Route: History (Needs higher limit vs Analysis)
     app.use(
-        '/api/ats',
-        aiLimiter, 
+        '/api/ats/history',
+        generalLimiter, // 100 per min (READ)
         verifyToken,
-        // checkTier('pro'), // <--- BLOCKS FREE USERS
         createProxyMiddleware({
             target: process.env.ATS_SERVICE_URL || 'http://localhost:7000',
             changeOrigin: true,
             pathRewrite: { '^/api/ats': '' },
             onProxyReq: (proxyReq, req, res) => {
+                proxyReq.setHeader('x-nexus-secret', process.env.NEXUS_INTERNAL_SECRET);
+                if (req.user) proxyReq.setHeader('x-user-id', req.user.id);
+            },
+            onError: (err, req, res) => res.status(502).json({ error: "ATS Service Down" })
+        })
+    );
+
+    // B. General Route: Analysis (Heavy AI usage)
+    app.use(
+        '/api/ats',
+        aiLimiter, // 10 per min (WRITE/AI)
+        verifyToken,
+        // checkTier('pro'), 
+        createProxyMiddleware({
+            target: process.env.ATS_SERVICE_URL || 'http://localhost:7000',
+            changeOrigin: true,
+            pathRewrite: { '^/api/ats': '' },
+            onProxyReq: (proxyReq, req, res) => {
+                // BUG FIX: Ensure query string is preserved for recalculate flag
+                const queryString = req.url.split('?')[1];
+                if (queryString && !proxyReq.path.includes('?')) {
+                    proxyReq.path += (proxyReq.path.includes('?') ? '&' : '?') + queryString;
+                }
+
                 // Ensure headers are preserved for file uploads
                 // 1. Inject the VIP Wristband (Secret Key)
                 proxyReq.setHeader('x-nexus-secret', process.env.NEXUS_INTERNAL_SECRET);

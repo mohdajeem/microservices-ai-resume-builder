@@ -1,7 +1,11 @@
 import express from 'express';
 import { register, login, changePassword, deleteAccount, getMe } from '../controllers/authController.js';
+import { requireInternal } from '../middlewares/requireInternal.js';
 
 const router = express.Router();
+
+// Apply requireInternal to protect routes from direct access outside the gateway
+// router.use(requireInternal);
 
 // Route: POST /api/auth/register
 // Desc:  Create a new user

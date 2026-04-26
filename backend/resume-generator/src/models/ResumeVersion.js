@@ -35,7 +35,12 @@ const ResumeVersionSchema = new mongoose.Schema({
   atsAnalysis: {
     suggestions: [String],
     missingKeywords: [String]
-  }
+  },
+
+  compactMode: { type: Boolean, default: false },
+
+  // CACHING KEY: Store the hash of the LaTeX code for PDF caching
+  lastRenderedHash: { type: String, default: null }
 
 }, { timestamps: true });
 
