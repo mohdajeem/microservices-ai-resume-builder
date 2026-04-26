@@ -7,12 +7,13 @@
     "dev": "node --watch server.js"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.1.3",
+    "axios": "^1.14.0",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "express": "^4.22.1",
     "express-mongo-sanitize": "^2.2.0",
     "mongoose": "^7.8.7",
+    "morgan": "^1.10.1",
     "zod": "^4.1.13"
   }
 }

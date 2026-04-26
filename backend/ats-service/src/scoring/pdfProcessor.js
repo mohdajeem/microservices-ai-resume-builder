@@ -8,13 +8,13 @@ const require = createRequire(import.meta.url);
 const pdfjsLib = require("pdfjs-dist/legacy/build/pdf.js");
 
 /**
- * Cleans artifacts, bullets, and excessive whitespace
+ * Cleans artifacts and normalizes whitespace while preserving structure
  */
 const cleanText = (text) => {
   return text
-    .replace(/\n+/g, " ") // Flatten newlines
-    .replace(/\s+/g, " ") // Flatten spaces
-    .replace(/[•●▪►]/g, "") // Remove bullets
+    .replace(/[•●▪►]/g, "-") // Convert bullets
+    .replace(/[ ]+/g, " ")   // Normalize horizontal spaces
+    .replace(/\n{3,}/g, "\n\n") // Max 2 newlines
     .trim();
 };
 
@@ -24,34 +24,44 @@ const cleanText = (text) => {
  */
 export async function extractTextFromBuffer(buffer) {
   try {
-    // 3. Convert Node Buffer to Uint8Array (Required by pdfjs-dist)
+    console.log(`[PDF-PROCESSOR] Synchronous extraction fallback called (${buffer.length} bytes)`);
     const data = new Uint8Array(buffer);
     
-    // 4. Load the document
-    // We use the promise directly.
     const loadingTask = pdfjsLib.getDocument({ 
       data,
-      // Disable font face loading (not needed for text extraction)
-      disableFontFace: true 
+      disableFontFace: false 
     });
     
     const pdf = await loadingTask.promise;
     let fullText = "";
 
-    // 5. Iterate pages to extract strings
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const content = await page.getTextContent();
       
-      // Join strings
-      const pageText = content.items.map((item) => item.str).join(" ");
-      fullText += pageText + " ";
+      // Sort items by Y then X (simplified spatial sort)
+      const items = content.items.map(it => ({
+        str: it.str,
+        x: it.transform[4],
+        y: it.transform[5]
+      })).sort((a,b) => (Math.abs(a.y - b.y) < 5) ? (a.x - b.x) : (b.y - a.y));
+
+      let lastY = -1;
+      items.forEach(it => {
+        if (lastY !== -1 && Math.abs(it.y - lastY) > 7) fullText += "\n";
+        else if (fullText.length > 0 && !fullText.endsWith("\n")) fullText += " ";
+        fullText += it.str;
+        lastY = it.y;
+      });
+      fullText += "\n\n";
     }
 
-    return cleanText(fullText);
+    const result = cleanText(fullText);
+    console.log(`[PDF-PROCESSOR] ✅ Extraction complete (${result.length} characters)`);
+    return result;
 
   } catch (error) {
-    console.error("PDF Extraction Error:", error);
+    console.error("[PDF-PROCESSOR] ❌ Extraction Error:", error);
     throw new Error("Failed to parse PDF: " + error.message);
   }
 }

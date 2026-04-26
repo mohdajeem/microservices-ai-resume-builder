@@ -1,7 +1,12 @@
 import MasterProfile from '../models/MasterProfile.js';
 import ResumeVersion from '../models/ResumeVersion.js';
 import { generateLatexString } from '../services/latexService.js';
-import { generateComprehensiveAudit, generateCoverLetter } from '../services/aiService.js';
+import { 
+  generateComprehensiveAudit, 
+  generateCoverLetter,
+  compactResumeContent 
+} from '../services/aiService.js';
+import { generateHash } from '../utils/hashHelper.js';
 
 // =========================================================
 // HELPER FUNCTIONS
@@ -49,7 +54,8 @@ const normalizeResumeData = (rawData, userId) => {
       linkedin: getNested(rawData, 'LINKEDIN') || getNested(rawData.personalInfo, 'linkedin'),
       github: getNested(rawData, 'GITHUB') || getNested(rawData.personalInfo, 'github'),
       location: getNested(rawData, 'LOCATION') || getNested(rawData.personalInfo, 'location'),
-      portfolio: getNested(rawData, 'PORTFOLIO') || getNested(rawData.personalInfo, 'portfolio')
+      portfolio: getNested(rawData, 'PORTFOLIO') || getNested(rawData.personalInfo, 'portfolio'),
+      summary: getNested(rawData, 'SUMMARY') || getNested(rawData.personalInfo, 'summary')
     },
     
     experience: (rawData.EXPERIENCE || rawData.experience || []).map(e => ({
@@ -81,6 +87,7 @@ const normalizeResumeData = (rawData, userId) => {
       databases: getNested(rawData.SKILLS || rawData.skills, 'databases'),
       core_concepts: getNested(rawData.SKILLS || rawData.skills, 'core_concepts'),
       soft_skills: getNested(rawData.SKILLS || rawData.skills, 'soft_skills'),
+      additional_skills: getNested(rawData.SKILLS || rawData.skills, 'additional_skills') || getNested(rawData.SKILLS || rawData.skills, 'ADDITIONAL_SKILLS'),
     },
 
     // APPLY THE FIX HERE
@@ -131,15 +138,23 @@ export const createProfile = async (req, res) => {
     const initialContent = { ...masterData };
     delete initialContent.userId; 
 
+    const compactMode = req.body.compactMode === true;
+
     // Generate LaTeX
-    const latexCode = generateLatexString({ content: initialContent });
+    const latexCode = generateLatexString({ 
+      content: initialContent,
+      compactMode: compactMode
+    });
+    const contentHash = generateHash(latexCode);
 
     const newVersion = new ResumeVersion({
       userId,
       masterProfileId: masterProfile._id, // Link to master, even if we didn't update it
       versionName: customTitle,
       content: initialContent,
-      latexCode: latexCode
+      latexCode: latexCode,
+      compactMode: compactMode,
+      lastRenderedHash: contentHash
     });
 
     await newVersion.save();
@@ -150,7 +165,8 @@ export const createProfile = async (req, res) => {
       masterId: masterProfile._id,
       resumeId: newVersion._id,
       latexCode, 
-      content: initialContent 
+      content: initialContent,
+      lastRenderedHash: contentHash
     });
 
   } catch (error) {
@@ -162,18 +178,85 @@ export const createProfile = async (req, res) => {
 // 2. Audit Resume (AI)
 export const auditResume = async (req, res) => {
   try {
-    // Extract atsImprovements from request body
-    const { resumeData, jobDescription, atsImprovements } = req.body;
+    console.log("[RESUME-SERVICE] 🔍 Audit Request Received");
+    // Extract atsImprovements and compactMode from request body
+    const { resumeData, jobDescription, atsImprovements, bypassCache, compactMode } = req.body;
+    console.log("req.body: ", req.body);
+    if (!resumeData || !jobDescription) {
+        console.warn("[RESUME-SERVICE] ⚠️ Missing resumeData or jobDescription in Audit body");
+        return res.status(400).json({ error: "Missing required fields for audit" });
+    }
+
+    console.log("Passes first check");
     // Pass it to the service
     const auditReport = await generateComprehensiveAudit(
         resumeData, 
         jobDescription, 
-        atsImprovements || [] // Default to empty array if not provided
+        atsImprovements || [], // Default to empty array if not provided
+        bypassCache === true,
+        compactMode === true
     );
+    console.log("[RESUME-SERVICE] ✅ Audit Completed Successfully, here is the res: ", auditReport);
     res.json({ success: true, report: auditReport });
   } catch (error) {
-    console.error(error);
+    console.error("[RESUME-SERVICE] ❌ Audit Controller Error:", error.message);
     res.status(500).json({ error: error.message });
+  }
+};
+
+// 2.1 One-Way AI Compaction
+export const aiCompactResume = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { resumeData } = req.body;
+
+    if (!resumeData) {
+      return res.status(400).json({ error: "No resume data provided for compaction" });
+    }
+
+    console.log(`[RESUME-SERVICE] ✂️ AI Compact Request for ID: ${id}`);
+    
+    // 1. Call AI to rewrite content
+    const compactedData = await compactResumeContent(resumeData);
+    
+    if (!compactedData || !compactedData.experience) {
+      throw new Error("AI failed to produce valid compacted JSON.");
+    }
+
+    // 2. Merge changes into existing structure
+    // We only want to overwrite experience and projects
+    const finalContent = {
+       ...resumeData,
+       experience: compactedData.experience,
+       projects: compactedData.projects
+    };
+
+    // 3. Update DB if ID is provided
+    let responsePayload = { success: true, content: finalContent };
+
+    if (id && id !== 'new') {
+       const resume = await ResumeVersion.findById(id);
+       if (resume) {
+          resume.content = finalContent;
+          resume.compactMode = true; // Auto-enable layout toggle
+          
+          const newLatex = generateLatexString({ 
+            content: finalContent, 
+            compactMode: true 
+          });
+          resume.latexCode = newLatex;
+          resume.lastRenderedHash = generateHash(newLatex);
+          
+          await resume.save();
+          responsePayload.latexCode = resume.latexCode;
+          responsePayload.lastRenderedHash = resume.lastRenderedHash;
+       }
+    }
+
+    res.json(responsePayload);
+  } catch (error) {
+    console.error("[RESUME-SERVICE] ❌ AI Compact Error:", error.message);
+    res.status(500).json({ error: "AI Compaction failed", details: error.message });
   }
 };
 
@@ -183,7 +266,7 @@ export const auditResume = async (req, res) => {
 export const updateResumeVersion = async (req, res) => {
   try {
     const { id } = req.params; 
-    const { updatedContent, atsScore, atsAnalysis, jobDescription } = req.body; 
+    const { updatedContent, atsScore, atsAnalysis, jobDescription, compactMode } = req.body; 
 
     const resume = await ResumeVersion.findById(id);
     if (!resume) return res.status(404).json({ error: "Resume not found" });
@@ -195,11 +278,19 @@ export const updateResumeVersion = async (req, res) => {
       delete cleanContent.userId; 
       
       resume.content = cleanContent;
-      
-      // Regenerate LaTeX
-      const newLatex = generateLatexString(resume);
-      resume.latexCode = newLatex;
     }
+
+    if (compactMode !== undefined) {
+      resume.compactMode = compactMode === true;
+    }
+
+    // Always regenerate LaTeX if content or mode changed
+    const newLatex = generateLatexString({ 
+      content: resume.content, 
+      compactMode: resume.compactMode 
+    });
+    resume.latexCode = newLatex;
+    resume.lastRenderedHash = generateHash(newLatex);
 
     // CHECK 2: Do we have ATS Data to update?
     if (atsScore !== undefined) resume.atsScore = atsScore;
@@ -213,7 +304,8 @@ export const updateResumeVersion = async (req, res) => {
       message: "Resume updated", 
       latexCode: resume.latexCode,
       content: resume.content,
-      atsScore: resume.atsScore
+      atsScore: resume.atsScore,
+      lastRenderedHash: resume.lastRenderedHash
     });
   } catch (error) {
     console.error("Update Error:", error);

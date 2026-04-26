@@ -1,26 +1,31 @@
 import express from 'express';
 import multer from 'multer';
-import { analyzeResume } from '../controllers/atsController.js';
+import { 
+  analyzeResume, 
+  getScanHistory, 
+  deleteScan, 
+  generateTailoredSummary,
+  getSmartSkills
+} from '../controllers/atsController.js';
 import { parseResume } from '../controllers/parserController.js';
+import { requireInternal } from '../middleware/requireInternal.js';
 
 const router = express.Router();
 
-// 1. Configure Multer
-// We use memoryStorage to keep the file in RAM for fast processing.
-// Limit file size to 5MB to prevent DoS attacks.
 const upload = multer({ 
   storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 } 
 });
 
-// 2. Define Routes
+router.use(requireInternal);
 
-// Route: POST /api/ats/analyze
-// Desc:  Scoring Engine (Resume PDF + JD Text -> Score JSON)
 router.post('/analyze', upload.single('resume'), analyzeResume);
-
-// Route: POST /api/ats/parse
-// Desc:  Extraction Engine (Resume PDF -> Master Profile JSON)
 router.post('/parse', upload.single('resume'), parseResume);
+router.post('/tailored-summary', generateTailoredSummary);
+router.post('/smart-skills', getSmartSkills);
+
+// NEW HISTORY ROUTES
+router.get('/history/:resumeId', getScanHistory);
+router.delete('/history/:scanId', deleteScan);
 
 export default router;

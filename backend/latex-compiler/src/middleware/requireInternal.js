@@ -19,3 +19,5 @@ export const requireInternal = (req, res, next) => {
     // 4. If match, let them in!
     next();
 };
+
+export default requireInternal;

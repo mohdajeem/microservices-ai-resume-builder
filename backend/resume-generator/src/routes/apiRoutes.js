@@ -2,6 +2,7 @@ import express from 'express';
 import { 
     createProfile, 
     auditResume, 
+    aiCompactResume, // <--- New Import
     updateResumeVersion, 
     getResumeLatex,
     getUserResumes,
@@ -15,18 +16,32 @@ import {
 
 import { validate, resumeSchema } from '../middlewares/validate.js';
 import { checkAILimit } from '../middlewares/usageMiddleware.js';
+import { requireInternal } from '../middlewares/requireInternal.js';
 
 const router = express.Router();
+
+// Apply requireInternal to protect routes from direct access outside the gateway
+router.use(requireInternal);
 
 // 1. Create Profile + Base Resume
 router.post('/create', validate(resumeSchema), createProfile);
 router.get('/list', getUserResumes);         // <-- Dashboard List (Fast)
 router.get('/detail/:id', getResumeById);    // <-- Load Editor
 
+console.log("[RESUME-ROUTES] Registering /audit POST route");
 // router.post('/create', createProfile);
 
 // 2. AI Audit (Get Suggestions)
-router.post('/audit', checkAILimit, auditResume);
+// router.post('/audit', checkAILimit, auditResume);
+router.post('/audit', auditResume);
+
+// 2.1 AI Compaction (One-Way Rewrite)
+console.log("[RESUME-ROUTES] Registering /compact-ai/:id POST route");
+router.post('/compact-ai/:id', (req, res, next) => {
+    console.log(`[RESUME-ROUTES DEBUG] Hit /compact-ai/:id with ID: ${req.params.id}`);
+    next();
+}, aiCompactResume);
+
 
 router.post('/cover-letter', checkAILimit, createCoverLetter);
 

@@ -4,7 +4,7 @@ import { resumeAPI, authAPI } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { 
     Plus, FileText, Calendar, Trash2, Loader2, 
-    UploadCloud, Settings, Zap, Crown, CheckCircle 
+    UploadCloud, Settings, Zap, Crown, CheckCircle, Target 
 } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 
@@ -246,9 +246,19 @@ const Dashboard = () => {
                         </p>
 
                         <div className="flex items-center justify-between pt-4 border-t border-gray-50 text-sm text-gray-400">
-                            <div className="flex items-center gap-1.5">
-                                <Calendar size={14} />
-                                <span>{new Date(resume.updatedAt).toLocaleDateString()}</span>
+                            <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-1.5">
+                                    <Calendar size={14} />
+                                    <span>{new Date(resume.updatedAt).toLocaleDateString()}</span>
+                                </div>
+                                <button 
+                                    onClick={(e) => { e.stopPropagation(); navigate(`/ats?resumeId=${resume._id}`); }}
+                                    className="flex items-center gap-1 hover:text-[#00c29f] transition-colors"
+                                    title="Check ATS Match for this version"
+                                >
+                                    <Target size={14} />
+                                    <span>Match</span>
+                                </button>
                             </div>
                             
                             <button 

@@ -11,7 +11,7 @@ export const Button = ({ children, loading, variant = 'primary', className = '',
   };
 
   return (
-    <button className={`${baseStyle} ${variants[variant]} ${className} py-3 px-6`} disabled={loading} {...props}>
+    <button className={`${baseStyle} ${variants[variant]} ${className} ${className.includes('p-') || className.includes('py-') || className.includes('h-') ? '' : 'py-3 px-6'}`} disabled={loading} {...props}>
       {loading && <Loader2 className="animate-spin mr-2 h-5 w-5" />}
       {children}
     </button>

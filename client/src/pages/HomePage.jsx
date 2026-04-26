@@ -307,25 +307,33 @@ const Features = () => {
       icon: <Zap className="text-amber-500" />,
       title: "Real-time ATS Scoring",
       desc: "Instant feedback on how well your resume matches the job description before you apply.",
-      color: "amber"
+      color: "amber",
+      bgClass: "bg-amber-50",
+      gradClass: "from-amber-50/50"
     },
     {
       icon: <MousePointer2 className="text-[#00c29f]" />,
       title: "Smart Editor",
       desc: "Drag, drop, and edit sections easily. Our AI suggests bullet points that highlight your impact.",
-      color: "teal"
+      color: "teal",
+      bgClass: "bg-teal-50",
+      gradClass: "from-teal-50/50"
     },
     {
       icon: <FileText className="text-blue-500" />,
       title: "PDF Extraction",
       desc: "Don't start from scratch. Upload your old PDF and let our parser structure it for you.",
-      color: "blue"
+      color: "blue",
+      bgClass: "bg-blue-50",
+      gradClass: "from-blue-50/50"
     },
     {
       icon: <Shield className="text-purple-500" />,
       title: "AI Audit",
       desc: "Get line-by-line suggestions to improve grammar, impact, and keyword density.",
-      color: "purple"
+      color: "purple",
+      bgClass: "bg-purple-50",
+      gradClass: "from-purple-50/50"
     }
   ];
 
@@ -342,10 +350,10 @@ const Features = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((f, i) => (
             <div key={i} className={`bg-white p-8 rounded-[2rem] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)] border border-gray-100/50 hover:-translate-y-3 hover:shadow-[0_20px_40px_-10px_rgba(0,194,159,0.15)] transition-all duration-500 group relative overflow-hidden`}>
-              <div className={`absolute inset-0 bg-gradient-to-br from-${f.color}-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
+              <div className={`absolute inset-0 bg-gradient-to-br ${f.gradClass} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
               <div className="relative z-10">
-                <div className={`w-16 h-16 bg-${f.color}-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 shadow-sm`}>
-                    {React.cloneElement(f.icon, { size: 30 })}
+                <div className={`w-16 h-16 ${f.bgClass} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 shadow-sm`}>
+                    {React.isValidElement(f.icon) ? React.cloneElement(f.icon, { size: 30 }) : null}
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-4 font-display">{f.title}</h3>
                 <p className="text-gray-500 leading-relaxed">{f.desc}</p>

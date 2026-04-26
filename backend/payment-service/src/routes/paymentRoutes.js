@@ -1,13 +1,14 @@
 import express from 'express';
 import { createCheckoutSession, handleWebhook } from '../controllers/paymentController.js';
+import { requireInternal } from '../middleware/requireInternal.js';
 
 const router = express.Router();
 
-// Route: POST /api/payment/create-checkout-session
-router.post('/create-checkout-session', express.json(), createCheckoutSession);
+// 1. Internal Route (Checkout Session)
+router.post('/create-checkout-session', requireInternal, express.json(), createCheckoutSession);
 
-// Route: POST /api/payment/webhook
-// Note: Webhook needs RAW body, handled in server.js or here
+// 2. Public Route (Stripe Webhook)
+// Webhook needs RAW body, handled in server.js or here
 router.post('/webhook', express.raw({ type: 'application/json' }), handleWebhook);
 
 export default router;

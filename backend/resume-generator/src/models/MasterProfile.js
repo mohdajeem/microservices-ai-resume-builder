@@ -63,7 +63,8 @@ const MasterProfileSchema = new mongoose.Schema({
     linkedin: String,
     github: String,
     location: String,
-    portfolio: String
+    portfolio: String,
+    summary: String
   },
   
   experience: [{
@@ -88,7 +89,8 @@ const MasterProfileSchema = new mongoose.Schema({
     tools: String,
     databases: String,
     core_concepts: String,
-    soft_skills: String
+    soft_skills: String,
+    additional_skills: String
   },
 
   education: [{

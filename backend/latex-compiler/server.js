@@ -17,20 +17,20 @@ app.get("/health", (req, res) => {
 
 app.use(requireInternal);
 
-app.post("/compile",async (req, res) => {
-    try{
-        const {tex, outputName} = req.body;
+app.post("/compile", async (req, res) => {
+    try {
+        const { tex, outputName, hash } = req.body;
 
-        if(!tex){
-            return res.status(400).json({error: "Missing 'tex' input."});
+        if (!tex) {
+            return res.status(400).json({ error: "Missing 'tex' input." });
         }
 
-        const pdf = await compileLatexToPdf(tex, outputName || "resume");
-        res.setHeader("Content-Type","application/pdf");
+        const pdf = await compileLatexToPdf(tex, outputName || "resume", hash);
+        res.setHeader("Content-Type", "application/pdf");
         res.send(pdf);
-    } catch(error){
-        console.error("Compile Error: ",error);
-        res.status(500).json({error: "Failed to compile PDF."});
+    } catch (error) {
+        console.error("Compile Error: ", error);
+        res.status(500).json({ error: "Failed to compile PDF." });
     }
 });
 const PORT = process.env.PORT || 6000;

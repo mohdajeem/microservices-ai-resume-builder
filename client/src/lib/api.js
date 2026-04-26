@@ -53,21 +53,26 @@ export const resumeAPI = {
   update: (id, data) => api.put(`/api/resume/update/${id}`, data), 
   delete: (id) => api.delete(`/api/resume/delete/${id}`),
   audit: (data) => api.post('/api/resume/audit', data),
+  compactAI: (id, data) => api.post(`/api/resume/compact-ai/${id}`, data),
   generateCoverLetter: (data) => api.post('/api/resume/cover-letter', data),
 };
 
 export const atsAPI = {
-  analyze: (formData) => api.post('/api/ats/analyze', formData, {
+  analyze: (formData, recalculate = false) => api.post(`/api/ats/analyze${recalculate ? '?recalculate=true' : ''}`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
   parse: (formData) => api.post('/api/ats/parse', formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
-  })
+  }),
+  getHistory: (resumeId) => api.get(`/api/ats/history/${resumeId}`),
+  deleteScan: (scanId) => api.delete(`/api/ats/history/${scanId}`),
+  getTailoredSummary: (data) => api.post('/api/ats/tailored-summary', data),
+  getSmartSkills: (data) => api.post('/api/ats/smart-skills', data),
 };
 
 export const compilerAPI = {
-  compile: (latexCode) => api.post('/api/compiler/compile', 
-    { tex: latexCode }, 
+  compile: (latexCode, hash = null) => api.post('/api/compiler/compile', 
+    { tex: latexCode, hash }, 
     { 
       responseType: 'blob', // CRITICAL: Tells Axios to expect binary PDF data
       headers: { 'Accept': 'application/pdf' }

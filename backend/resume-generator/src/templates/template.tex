@@ -96,6 +96,30 @@
 
 \newcommand\sbullet[1][.5]{\mathbin{\vcenter{\hbox{\scalebox{#1}{$\bullet$}}}}}
 
+% --- Compact Mode Support ---
+\newcommand{\compactMode}{
+  \addtolength{\topmargin}{-0.2in}
+  \addtolength{\textheight}{0.4in}
+  \setlength{\footskip}{5pt}
+  \titlespacing{\section}{0pt}{10pt}{8pt}
+  \setlist[itemize]{itemsep=3pt, topsep=4pt, parsep=0pt, partopsep=0pt}
+  \renewcommand{\resumeSubheading}[2]{\vspace{4pt}\item
+    \begin{tabular*}{1.0\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{\large##1} & \textbf{\small ##2} \\
+    \end{tabular*}\vspace{-2pt}
+  }
+  \renewcommand{\resumeProjectHeading}[2]{\vspace{4pt}\item
+    \begin{tabular*}{1.0\textwidth}{l@{\extracolsep{\fill}}r}
+      \small##1 & \textbf{\small ##2}\\
+    \end{tabular*}\vspace{-2pt}
+  }
+  \renewcommand{\resumeProjectHeading}[2]{\item
+    \begin{tabular*}{1.0\textwidth}{l@{\extracolsep{\fill}}r}
+      \small##1 & \textbf{\small ##2}\\
+    \end{tabular*}\vspace{-2pt}
+  }
+}
+
 %-------------------------------------------
 %%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
